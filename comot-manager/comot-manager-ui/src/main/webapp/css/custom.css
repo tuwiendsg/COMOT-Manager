@@ -1,0 +1,67 @@
+.node circle {
+	fill: #fff;
+	stroke: #00ff80;
+	stroke-width: 10px;
+}
+
+.node rect {
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 2px;
+}
+
+.node text {
+	font-size: 10px;
+}
+
+.bold {
+	font-weight: bold
+}
+
+.svg_ok {
+	fill: #287021;
+}
+
+.svg_warn {
+	fill: #ff7f0e;
+}
+
+.svg_error {
+	fill: #d9534f;
+}
+
+.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 2px;
+}
+
+circle.lc {
+	fill: #1f77b4;
+	stroke-width: 0;
+}
+
+circle.lc.current {
+	fill: #ff7f0e;
+}
+
+circle.lc.last {
+	fill: #ffbb78;
+}
+
+circle.lc.init {
+	fill: #aec7e8;
+}
+
+#lastAction {
+	fill: #ffbb78;
+}
+
+.link.lastAction {
+	stroke: #ffbb78;
+}
+
+.nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}

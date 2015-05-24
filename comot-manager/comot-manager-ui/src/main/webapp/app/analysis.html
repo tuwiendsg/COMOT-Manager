@@ -1,0 +1,39 @@
+<div class="container">
+
+	<h2>Analysis</h2>
+
+	<h4>
+		<b>ID:</b> <span data-bind="text: serviceId"></span>
+	</h4>
+	<div>&nbsp;</div>
+
+
+	<div role="tabpanel">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" role="tablist" data-bind="foreach: tabs">
+			<li role="presentation" data-bind="css: { active: show }"><a role="tab" href="#" data-toggle="tab"
+				data-bind="text: name, click : $parent.showTab"></a></li>
+		</ul>
+		<!-- Tab panes  -->
+		<div class="tab-content" data-bind="foreach: tabs">
+			<div role="tabpanel" class="tab-pane" data-bind="css: { active: show }">
+				<div>&nbsp;</div>
+				<div data-bind="compose: { model:module , activationData:[ $parent.serviceId()] } "></div>
+			</div>
+		</div>
+	</div>
+
+	<!-- http://stackoverflow.com/questions/22312355/ns-error-failure-in-firefox-when-drawing-dimple-js-chart-after-jquery -->
+	<div class="col-md-8">
+		<div id="output1temp"></div>
+	</div>
+	<div class="col-md-6">
+		<div id="output2temp"></div>
+	</div>
+	<div class="col-md-12">
+		<div id="output3temp"></div>
+	</div>
+
+
+
+</div>

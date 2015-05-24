@@ -1,0 +1,81 @@
+
+<div class="container">
+
+	<h2>User-managed Elastic Platform Services</h2>
+	<div>&nbsp;</div>
+
+	<button type="button" class="btn btn-default pull-right disabled" data-toggle="modal" data-target="#myModal">
+		<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> New service
+	</button>
+
+	<h4>Available User-managed EPS:</h4>
+	<div>&nbsp;</div>
+
+	<div data-bind="foreach: services">
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<h3 class="panel-title" data-bind="text: id"></h3>
+			</div>
+			<div class="panel-body">
+
+				<p>
+					<b>EPS ID:</b> <span data-bind="text: id"></span>
+				</p>
+				<p>
+					<b>Cloud Service ID:</b> <span data-bind="text: templateId"></span>
+				</p>
+				<div>&nbsp;</div>
+				<button type="button" class="btn btn-default pull-right" data-bind="click: $root.newEpsInstance">
+					<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> New instance
+				</button>
+
+				<div data-bind="if: instances().length > 0">
+					<h4>Instances:</h4>
+
+					<table class="table table-hover table-condensed">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>ID</th>
+								<th>Service ID</th>
+								<th>Date created</th>
+								<th>Details</th>
+								<th>Remove</th>
+							</tr>
+						</thead>
+						<tbody data-bind="foreach: instances">
+							<tr>
+								<td data-bind="text: ($index() + 1)"></td>
+								<td data-bind="text: id"></td>
+								<td data-bind="text: serviceId"></td>
+								<td data-bind="text: dateCreatedFormated"></td>
+								<td><a data-bind="attr: { href: '#services/'+ serviceId }"><button type="button"
+											class="btn btn-default">
+											<span class="glyphicon glyphicon-search" aria-hidden="true"></span> View
+										</button></a></td>
+								<td>
+									<button type="button" class="btn btn-default"
+										data-bind="click:function() { $root.removeEpsInstance( $parent.id, id) }">
+										<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+									</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<form action="rest/eps/RSYBL_SERVICE_USER_MANAGED/instances" method="post" enctype="multipart/form-data">
+
+		<p>
+			Select a file : <input type="file" name="file" size="50" />
+		</p>
+
+		<input type="submit" value="Upload It" />
+	</form>
+
+</div>
+
+<!-- /.container -->

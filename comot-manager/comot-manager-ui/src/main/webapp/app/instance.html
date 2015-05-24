@@ -1,0 +1,293 @@
+
+<div class="container">
+
+	<h2>Elastic Cloud Service</h2>
+
+	<h4>
+		<b>ID:</b> <span data-bind="text: serviceId"></span>
+	</h4>
+	<div>&nbsp;</div>
+
+	<h4>Management:</h4>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<button type="button" class="btn btn-primary" data-bind="click: startInstance, css:{disabled : isEpsService} ">
+				<span class="glyphicon glyphicon-play" aria-hidden="true"></span> Start
+			</button>
+			<button type="button" class="btn btn-primary" data-bind="click: stopInstance, css:{disabled : isEpsService}">
+				<span class="glyphicon glyphicon-stop" aria-hidden="true"></span> Stop
+			</button>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_eps"
+				data-bind="css:{disabled : isEpsService} ">
+				<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> Assign supporting services
+			</button>
+
+			<!-- Modal -->
+			<div class="modal fade" id="modal_eps" tabindex="-1" role="dialog" aria-hidden="true">
+				<div class="modal-dialog" style="width: 900px">
+					<div class="modal-content">
+						<form data-bind="submit: $root.triggerCustomEventWithInput">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">
+									<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+								</button>
+								<h3>Available supporting services</h3>
+							</div>
+							<div class="modal-body">
+
+								<h4>External</h4>
+								<!-- ko foreach: allEpsServices -->
+								<!-- ko if: (typeof service === 'undefined') -->
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<div class="col-md-6">
+											<div class="row">
+												<b>Name: </b><span data-bind="text: id"></span>
+											</div>
+											<div class="row">
+												<b>Type: </b><span data-bind="text: osu.name"></span>
+											</div>
+											<div class="row">
+												<b>Role: </b>
+												<!-- ko foreach: osu.tags -->
+												<span data-bind="text: $data"></span>
+												<!-- /ko -->
+											</div>
+										</div>
+										<div class="col-md-4"></div>
+										<div class="col-md-2">
+											<button type="button" class="btn btn-primary" data-bind="click: $parent.assignEps">Assign</button>
+										</div>
+									</div>
+								</div>
+								<!-- /ko -->
+								<!-- /ko -->
+								<h4>User-managed</h4>
+								<!-- ko foreach: allEpsServices -->
+								<!-- ko if: (typeof service !== 'undefined') -->
+								<div class="panel panel-default">
+									<div class="panel-body">
+										<div class="col-md-5">
+											<div class="row">
+												<b>Name: </b><span data-bind="text: id"></span>
+											</div>
+											<div class="row">
+												<b>Type: </b><span data-bind="text: osu.name"></span>
+											</div>
+											<div class="row">
+												<b>Role: </b>
+												<!-- ko foreach: osu.tags -->
+												<span data-bind="text: $data"></span>
+												<!-- /ko -->
+											</div>
+										</div>
+										<div class="col-md-5">
+											<div class="row">
+												<b>Date created: </b><span data-bind="text: $root.toDate(service.dateCreated)"></span>
+											</div>
+										</div>
+										<div class="col-md-2">
+											<button type="button" class="btn btn-primary" data-bind="click: $parent.assignEps">Assign</button>
+										</div>
+									</div>
+								</div>
+								<!-- /ko -->
+								<!-- /ko -->
+
+								<a data-bind="attr: { href: '#eps' }"><button type="button" class="btn btn-default pull-right"
+										onclick="$('#modal_eps').modal('hide')">Manage EPSs</button></a>
+								<div>&nbsp;</div><div>&nbsp;</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<a data-bind="attr: { href: '#services/'+serviceId()+'/analysis' }"><button type="button" class="btn btn-default">
+					<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Analysis
+				</button></a> <a data-bind="attr: { href: '#services/'+serviceId()+'/history' }"><button type="button"
+					class="btn btn-default">
+					<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Event Log
+				</button></a>
+			<button type="button" class="btn btn-primary pull-right"
+				data-bind="click: killInstance , css:{disabled : isEpsService}">
+				<span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span> Terminate
+			</button>
+
+			<div>&nbsp;</div>
+
+			<h4>Supporting Elastic Platform Services:</h4>
+			<div data-bind="foreach: selectedEpsServices">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="col-md-3 nopadding">
+							<b>Name:</b>
+							<!-- ko if: (typeof viewEndpoint !== 'undefined') -->
+							<a data-bind="text: id, attr: {href: viewEndpoint}" target="_new">view</a>
+							<!-- /ko -->
+							<!-- ko if: (typeof viewEndpoint === 'undefined') -->
+							<span data-bind="text: id"></span>
+							<!-- /ko -->
+							<b>Type:</b> <span data-bind="text: osu.id"></span>
+						</div>
+						<div class="col-md-8 nopadding">
+							<!-- ko if: osu.PrimitiveOperations.Operation.length > 0 -->
+							<b>Actions:</b>
+							<!-- /ko -->
+							<!-- ko foreach: osu.PrimitiveOperations.Operation -->
+							<!-- ko if: type == 'comotCustomEvent' && additionalInput -->
+							<button type="button" class="btn btn-default btn-sm " data-toggle="modal" data-target="#myModal"
+								data-bind="css:{disabled : $root.isEpsService}">
+								<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> <span data-bind="text: name"></span>
+							</button>
+							<!-- Modal -->
+							<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+								aria-hidden="true">
+								<div class="modal-dialog" style="width: 900px">
+									<div class="modal-content">
+										<form data-bind="submit: $root.triggerCustomEventWithInput">
+											<div class="modal-header">
+												<button type="button" class="close" data-dismiss="modal">
+													<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+												</button>
+												<h4 class="modal-title" id="myModalLabel">
+													<span data-bind="text: name"></span>
+												</h4>
+											</div>
+											<div class="modal-body">
+												<b>Input data:</b> <input type="text" name="id" data-bind="value: $parent.id" style="visibility: hidden">
+												<input type="text" name="operation" data-bind="value: executeMethod" style="visibility: hidden">
+												<textarea name="data" class="form-control col-md-12" rows="30"></textarea>
+												<div>&nbsp;</div>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+												<button type="submit" class="btn btn-primary">Submit</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+							<!-- /ko -->
+							<!-- ko if: type == 'comotCustomEvent' && additionalInput == false-->
+							<button type="button" class="btn btn-primary btn-sm"
+								data-bind="click: function() { $root.triggerCustomEvent( $parent, executeMethod) }, css:{disabled : $root.isEpsService}">
+								<span data-bind="text: name"></span>
+							</button>
+							<!-- /ko -->
+							<!-- /ko -->
+						</div>
+						<div class="col-md-1 nopadding">
+							<button type="button" class="btn btn-primary pull-right btn-sm"
+								data-bind="click: $root.removeEps, css:{disabled : $root.isEpsService}">
+								<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Unassign
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div>&nbsp;</div>
+			<h4>Elasticity configuration:</h4>
+			<div data-bind="template: { name: 'entityTemplate', data: elasticConfiguration } "></div>
+
+		</div>
+	</div>
+
+	<script type="text/ko" id="entityTemplate">
+	<!-- ko if: $data !== ""  -->
+	<div class="panel panel-default">	
+		<div class="panel-heading">
+			<b><span data-bind="text: type"></span></b>
+    		<span data-bind="text: name"></span>
+			<button type="button" class="btn btn-default btn-xs pull-right" data-bind="click: addDirective, css:{disabled : $root.isEpsService}">Add</button>
+		</div>
+		<div class="panel-body">
+ 			<!-- ko foreach : directives -->
+				<div class="row">
+    				<div class="form-group">
+						<!-- ko if: typeof added != 'undefined'  -->
+						<div class="col-md-2">
+  							<input class="form-control" data-bind="value: id" placeholder="ID">
+						</div>
+						<!-- /ko -->
+						<!-- ko if: typeof added == 'undefined' -->
+  						<label class="col-md-2 control-label" data-bind="text: id"></label>
+						<!-- /ko -->
+						<div class="col-md-9">
+  							<input class="form-control" data-bind="value: directive" placeholder="SYBL directive">
+						</div>
+					</div>
+					<button type="button" class="btn btn-default btn-xs vcenter" data-bind="click: $parent.removeDirective, css:{disabled : $root.isEpsService}">Remove</button>
+				</div>
+    		<!-- /ko -->
+			
+   			<!-- ko foreach : children -->
+				<!-- ko if: type === 'TOPOLOGY' || (type === 'UNIT' && elasticUnit)  -->
+    				<div data-bind="template: { name: 'entityTemplate', data: $data }"></div>
+				<!-- /ko -->
+    		<!-- /ko -->
+			
+			<!-- ko if: type === 'SERVICE' -->
+				<button type="button" class="btn btn-primary btn-sm" data-bind="click: $root.reconfigureElasticity , css:{disabled : $root.isEpsService}">Save</button>
+			<!-- /ko -->
+		</div>
+	</div>
+	<!-- /ko -->
+	</script>
+
+
+	<h4>State hierarchy:</h4>
+	<div id="tree_div"></div>
+	<div>&nbsp;</div>
+
+	<div class="col-md-6">
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default btn-sm" data-bind="text: groupId"></button>
+			<button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+				<span class="caret"></span> <span class="sr-only">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu" role="menu" data-bind="foreach: transitions">
+				<li><a href="#" data-bind="text: value.groupId, click: function() { $root.showThisGroup( value.groupId ) } "></a></li>
+			</ul>
+		</div>
+		<h4>
+			Lifecycle of <span data-bind="text: groupType"></span>
+		</h4>
+		<div class="well well-sm">
+			<div id="lifecycle_div"></div>
+		</div>
+	</div>
+
+	<!-- EVENTS -->
+
+	<div class="col-md-6">
+		<div class="row"></div>
+		<div class="row">
+			<h4>Latest events:</h4>
+			<div class="table-responsive">
+				<table class="table table-condensed">
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Service Entity</th>
+							<th>Origin</th>
+						</tr>
+					</thead>
+					<tbody data-bind="foreach: events">
+						<!-- style="display: block; height: 450px; overflow: auto" -->
+						<tr>
+							<td><small data-bind="text: name, style: { fontWeight: lifecycle ? 'bold' : '' }  "></small></td>
+							<td><small data-bind="text: target"></small></td>
+							<td><small data-bind="text: origin"></small></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div id="output"></div>
+
+</div>
+
+<!-- /.container -->
