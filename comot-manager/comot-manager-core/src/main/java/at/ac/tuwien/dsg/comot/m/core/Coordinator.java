@@ -44,7 +44,6 @@ import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
-import at.ac.tuwien.dsg.comot.m.common.eps.DeploymentClient;
 import at.ac.tuwien.dsg.comot.m.common.event.AbstractEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
@@ -71,8 +70,6 @@ public class Coordinator {
 	protected InformationClient infoService;
 	@Autowired
 	protected LifeCycleManager lcManager;
-	@Autowired
-	protected DeploymentClient deployment;
 	@Autowired
 	protected RabbitTemplate amqp;
 

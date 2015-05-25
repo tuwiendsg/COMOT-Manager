@@ -27,13 +27,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oasis.tosca.Definitions;
 
-import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
-import at.ac.tuwien.dsg.comot.m.common.enums.ComotEvent;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
+import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.TeAgentAdapter;
 import at.ac.tuwien.dsg.comot.m.cs.UtilsCs;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.ComotEvent;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.type.State;
 
@@ -57,8 +57,8 @@ public class MonitoringTest extends AbstractTest {
 
 		assertFalse(deployment.isManaged(serviceId));
 
-		staticDeplId = infoService.instanceIdOfStaticEps(Constants.SALSA_SERVICE_STATIC);
-		staticMonitoringId = infoService.instanceIdOfStaticEps(Constants.MELA_SERVICE_STATIC);
+		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
+		staticMonitoringId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.MELA_SERVICE_STATIC);
 
 		coordinator.assignSupportingOsu(serviceId, staticDeplId);
 		coordinator.assignSupportingOsu(serviceId, staticMonitoringId);
@@ -79,7 +79,7 @@ public class MonitoringTest extends AbstractTest {
 
 		agent.waitForLifeCycleEvent(Action.START);
 
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.MELA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.MELA_SERVICE_STATIC));
 		assertFalse(monitoring.isMonitored(serviceId));
 
 		agent.waitForLifeCycleEvent(Action.DEPLOYED);
@@ -90,7 +90,7 @@ public class MonitoringTest extends AbstractTest {
 		assertTrue(deployment.isRunning(serviceId));
 
 		// check automatically started
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.MELA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.MELA_SERVICE_STATIC));
 		assertTrue(monitoring.isMonitored(serviceId));
 
 		// manually stop
@@ -100,7 +100,7 @@ public class MonitoringTest extends AbstractTest {
 		agent.waitForCustomEvent(ComotEvent.MELA_STOP.toString());
 		UtilsT.sleepSeconds(3);
 
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.MELA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.MELA_SERVICE_STATIC));
 		assertFalse(monitoring.isMonitored(serviceId));
 
 		// manually start
@@ -110,7 +110,7 @@ public class MonitoringTest extends AbstractTest {
 		agent.waitForCustomEvent(ComotEvent.MELA_START.toString());
 		UtilsT.sleepSeconds(3);
 
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.MELA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.MELA_SERVICE_STATIC));
 		assertTrue(monitoring.isMonitored(serviceId));
 
 		coordinator.stopService(serviceId);
@@ -121,7 +121,7 @@ public class MonitoringTest extends AbstractTest {
 		agent.assertLifeCycleEvent(Action.UNDEPLOYED);
 		UtilsT.sleepSeconds(3);
 
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.MELA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.MELA_SERVICE_STATIC));
 		assertFalse(monitoring.isMonitored(serviceId));
 		assertFalse(deployment.isManaged(serviceId));
 

@@ -40,7 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-import at.ac.tuwien.dsg.comot.m.common.Constants;
+import at.ac.tuwien.dsg.comot.m.common.InfoServiceConstants;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
@@ -65,7 +65,7 @@ public class Resource {
 	protected Object sync = new Object();
 
 	@POST
-	@Path(Constants.TEMPLATES)
+	@Path(InfoServiceConstants.TEMPLATES)
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response createTemplate(CloudService service) throws EpsException, ComotException, JAXBException,
 			ClassNotFoundException, IOException {
@@ -76,7 +76,7 @@ public class Resource {
 	}
 
 	@DELETE
-	@Path(Constants.TEMPLATES_ONE)
+	@Path(InfoServiceConstants.TEMPLATES_ONE)
 	public Response deleteTemplate(@PathParam("templateId") String templateId) throws EpsException,
 			ComotException {
 		synchronized (sync) {
@@ -87,7 +87,7 @@ public class Resource {
 
 	@GET
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.TEMPLATES)
+	@Path(InfoServiceConstants.TEMPLATES)
 	public Response getTemplates() throws ClassNotFoundException, IOException, EpsException {
 
 		List<Template> templates;
@@ -100,7 +100,7 @@ public class Resource {
 	// SERVICE
 
 	@POST
-	@Path(Constants.TEMPLATES_ONE_SERVICES)
+	@Path(InfoServiceConstants.TEMPLATES_ONE_SERVICES)
 	@Consumes(MediaType.WILDCARD)
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response createServiceFromTemplate(
@@ -115,7 +115,7 @@ public class Resource {
 
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
-	@Path(Constants.SERVICES)
+	@Path(InfoServiceConstants.SERVICES)
 	public Response createService(CloudService service) throws ClassNotFoundException, IOException {
 		String result;
 		synchronized (sync) {
@@ -126,7 +126,7 @@ public class Resource {
 	}
 
 	@DELETE
-	@Path(Constants.SERVICE_ONE)
+	@Path(InfoServiceConstants.SERVICE_ONE)
 	public Response deleteService(
 			@PathParam("serviceId") String serviceId) {
 		synchronized (sync) {
@@ -137,7 +137,7 @@ public class Resource {
 
 	@GET
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.SERVICES)
+	@Path(InfoServiceConstants.SERVICES)
 	public Response getServices() {
 		List<CloudService> result;
 		synchronized (sync) {
@@ -151,7 +151,7 @@ public class Resource {
 
 	@PUT
 	@Produces(MediaType.TEXT_PLAIN)
-	@Path(Constants.SERVICE_ONE_ELASTICITY)
+	@Path(InfoServiceConstants.SERVICE_ONE_ELASTICITY)
 	public Response reconfigureElasticity(@PathParam("serviceId") String serviceId, CloudService service)
 			throws ClassNotFoundException, IOException {
 
@@ -164,7 +164,7 @@ public class Resource {
 
 	// UNIT INSTANCES
 	@PUT
-	@Path(Constants.UNIT_INSTANCE_ONE)
+	@Path(InfoServiceConstants.UNIT_INSTANCE_ONE)
 	public Response putUnitInstance(
 			@PathParam("serviceId") String serviceId,
 			@PathParam("unitId") String unitId,
@@ -177,7 +177,7 @@ public class Resource {
 
 	@DELETE
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.UNIT_INSTANCE_ONE)
+	@Path(InfoServiceConstants.UNIT_INSTANCE_ONE)
 	public Response removeUnitInstance(
 			@PathParam("serviceId") String serviceId,
 			@PathParam("unitInstanceId") String unitInstanceId) {
@@ -191,7 +191,7 @@ public class Resource {
 
 	@GET
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.EPSES)
+	@Path(InfoServiceConstants.EPSES)
 	public Response getOsus() {
 		List<OfferedServiceUnit> result;
 		synchronized (sync) {
@@ -205,7 +205,7 @@ public class Resource {
 
 	@POST
 	@Produces(MediaType.TEXT_PLAIN)
-	@Path(Constants.EPSES)
+	@Path(InfoServiceConstants.EPSES)
 	public Response addOsu(OfferedServiceUnit osu) {
 
 		String result;
@@ -217,7 +217,7 @@ public class Resource {
 
 	@GET
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.EPS_INSTANCES_ALL)
+	@Path(InfoServiceConstants.EPS_INSTANCES_ALL)
 	public Response getOsuInstances() {
 		List<OsuInstance> result;
 		synchronized (sync) {
@@ -233,7 +233,7 @@ public class Resource {
 
 	@POST
 	@Consumes(MediaType.TEXT_PLAIN)
-	@Path(Constants.EPS_ONE_INSTANCES)
+	@Path(InfoServiceConstants.EPS_ONE_INSTANCES)
 	public Response createOsuInstance(
 			@PathParam("epsId") String epsId) throws ClassNotFoundException, IOException {
 		String result;
@@ -245,7 +245,7 @@ public class Resource {
 
 	@DELETE
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.EPS_INSTANCE_ONE)
+	@Path(InfoServiceConstants.EPS_INSTANCE_ONE)
 	public Response removeOsuInatance(
 			@PathParam("epsInstanceId") String epsInstanceId) {
 		synchronized (sync) {
@@ -256,7 +256,7 @@ public class Resource {
 
 	@PUT
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.EPS_INSTANCE_ASSIGNMENT)
+	@Path(InfoServiceConstants.EPS_INSTANCE_ASSIGNMENT)
 	public Response assignEps(
 			@PathParam("serviceId") String serviceId,
 			@PathParam("epsId") String epsId) {
@@ -268,7 +268,7 @@ public class Resource {
 
 	@DELETE
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.EPS_INSTANCE_ASSIGNMENT)
+	@Path(InfoServiceConstants.EPS_INSTANCE_ASSIGNMENT)
 	public Response removeEpsAssignment(
 			@PathParam("serviceId") String instanceId,
 			@PathParam("epsId") String epsId) {
@@ -280,7 +280,7 @@ public class Resource {
 
 	@DELETE
 	@Consumes(MediaType.WILDCARD)
-	@Path(Constants.DELETE_ALL)
+	@Path(InfoServiceConstants.DELETE_ALL)
 	public Response deleteAll() {
 		synchronized (sync) {
 			infoServ.deleteAll();

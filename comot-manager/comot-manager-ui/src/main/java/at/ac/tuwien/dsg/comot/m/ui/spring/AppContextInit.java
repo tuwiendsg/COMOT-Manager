@@ -16,34 +16,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.core.adapter;
+package at.ac.tuwien.dsg.comot.m.ui.spring;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
 
-import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
-import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
-import at.ac.tuwien.dsg.comot.m.cs.adapter.Monitoring;
+import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCore;
 
-@Component
-@Scope("prototype")
-public class MonitoringAdapterStatic implements EpsAdapterStatic {
-
-	@Autowired
-	protected Monitoring processor;
-	@Autowired
-	protected PerInstanceQueueManager manager;
-	@Autowired
-	protected InformationClient infoService;
-
-	@Override
-	public void start(String participantId, String host, Integer port) throws Exception {
-
-		processor.setHostAndPort(host, port);
-
-		manager.start(participantId, processor);
-	}
+@Configuration
+@PropertySource({ "${config.path}/init.properties" })
+@Profile(AppContextCore.INSERT_INIT_DATA)
+public class AppContextInit {
 
 }

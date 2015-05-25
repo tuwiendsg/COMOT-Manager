@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -34,6 +33,7 @@ import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
 import at.ac.tuwien.dsg.comot.m.core.analytics.ElasticityAnalyzis;
 import at.ac.tuwien.dsg.comot.m.core.analytics.ResultLine;
 import at.ac.tuwien.dsg.comot.m.core.analytics.TimeAnalyzis;
+import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.TeAgentAdapter;
 import at.ac.tuwien.dsg.comot.m.recorder.RecorderException;
 import at.ac.tuwien.dsg.comot.m.recorder.repo.ChangeRepo;
@@ -68,7 +68,7 @@ public class EvalTest extends AbstractTest {
 	@Test
 	public void oneSALSA() throws Exception {
 
-		staticDeplId = infoService.instanceIdOfStaticEps(Constants.SALSA_SERVICE_STATIC);
+		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
 		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
 
 		List<String> services = new ArrayList<>();
@@ -105,14 +105,14 @@ public class EvalTest extends AbstractTest {
 	@Test
 	public void multipleDynamicSALSA() throws Exception {
 
-		staticDeplId = infoService.instanceIdOfStaticEps(Constants.SALSA_SERVICE_STATIC);
+		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
 		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
 
 		// deploy dynamic salsas
 		for (int i = 0; i < number; i++) {
 			UtilsT.sleepSeconds(delay);
 
-			OfferedServiceUnit salsaOsu = infoService.getOsu(Constants.SALSA_SERVICE_DYNAMIC);
+			OfferedServiceUnit salsaOsu = infoService.getOsu(AppContextCoreInsertData.SALSA_SERVICE_DYNAMIC);
 			coordinator.createDynamicService(salsaOsu.getId());
 		}
 

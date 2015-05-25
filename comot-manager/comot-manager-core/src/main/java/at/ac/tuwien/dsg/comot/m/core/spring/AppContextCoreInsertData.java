@@ -36,14 +36,14 @@ import org.springframework.core.env.Environment;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
-import at.ac.tuwien.dsg.comot.m.common.enums.ComotEvent;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotAdapterException;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.core.Coordinator;
-import at.ac.tuwien.dsg.comot.m.core.adapter.ControlAdapterStatic;
-import at.ac.tuwien.dsg.comot.m.core.adapter.DeploymentAdapterStatic;
-import at.ac.tuwien.dsg.comot.m.core.adapter.MonitoringAdapterStatic;
 import at.ac.tuwien.dsg.comot.m.cs.UtilsCs;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.ComotEvent;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.ControlAdapterStatic;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.DeploymentAdapterStatic;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.MonitoringAdapterStatic;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.ToscaMapper;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.devel.structure.Template;
@@ -59,6 +59,13 @@ import at.ac.tuwien.dsg.comot.model.type.OsuType;
 public class AppContextCoreInsertData {
 
 	public static final Logger LOG = LoggerFactory.getLogger(AppContextCoreInsertData.class);
+
+	public static final String SALSA_SERVICE_STATIC = "SALSA_SERVICE";
+	public static final String MELA_SERVICE_STATIC = "MELA_SERVICE";
+	public static final String RSYBL_SERVICE_STATIC = "RSYBL_SERVICE";
+	public static final String MELA_SERVICE_DYNAMIC = "MELA_SERVICE_USER_MANAGED";
+	public static final String RSYBL_SERVICE_DYNAMIC = "RSYBL_SERVICE_USER_MANAGED";
+	public static final String SALSA_SERVICE_DYNAMIC = "SALSA_SERVICE_USER_MANAGED";
 
 	@javax.annotation.Resource
 	public Environment env;
@@ -100,7 +107,7 @@ public class AppContextCoreInsertData {
 		// SALSA
 
 		OfferedServiceUnit deployment = new OfferedServiceUnit(
-				Constants.SALSA_SERVICE_STATIC, Constants.SALSA_SERVICE_STATIC, OsuType.EPS.toString(),
+				SALSA_SERVICE_STATIC, SALSA_SERVICE_STATIC, OsuType.EPS.toString(),
 				new String[] { Constants.ROLE_DEPLOYER });
 		deployment.hasResource(new Resource(DeploymentAdapterStatic.class.getCanonicalName(),
 				new ResourceOrQualityType(Constants.ADAPTER_CLASS)));
@@ -114,7 +121,7 @@ public class AppContextCoreInsertData {
 
 		// MELA
 		OfferedServiceUnit monitoring = new OfferedServiceUnit(
-				Constants.MELA_SERVICE_STATIC, Constants.MELA_SERVICE_STATIC, OsuType.EPS.toString(),
+				MELA_SERVICE_STATIC, MELA_SERVICE_STATIC, OsuType.EPS.toString(),
 				new String[] { Constants.ROLE_OBSERVER });
 		monitoring.hasResource(new Resource(MonitoringAdapterStatic.class.getCanonicalName(),
 				new ResourceOrQualityType(Constants.ADAPTER_CLASS)));
@@ -136,7 +143,7 @@ public class AppContextCoreInsertData {
 		// RSYBL
 
 		OfferedServiceUnit control = new OfferedServiceUnit(
-				Constants.RSYBL_SERVICE_STATIC, Constants.RSYBL_SERVICE_STATIC, OsuType.EPS.toString(),
+				RSYBL_SERVICE_STATIC, RSYBL_SERVICE_STATIC, OsuType.EPS.toString(),
 				new String[] { Constants.ROLE_CONTROLLER });
 		control.hasResource(new Resource(ControlAdapterStatic.class.getCanonicalName(), new ResourceOrQualityType(
 				Constants.ADAPTER_CLASS)));
@@ -172,7 +179,7 @@ public class AppContextCoreInsertData {
 					.loadTosca(fileBase + "init/mela_user_managed.xml"));
 
 			OfferedServiceUnit monitoringDynamic = new OfferedServiceUnit(
-					Constants.MELA_SERVICE_DYNAMIC, Constants.MELA_SERVICE_DYNAMIC, OsuType.EPS.toString(),
+					MELA_SERVICE_DYNAMIC, MELA_SERVICE_DYNAMIC, OsuType.EPS.toString(),
 					new String[] { Constants.ROLE_OBSERVER });
 
 			monitoringDynamic.hasPrimitiveOperation(
@@ -196,7 +203,7 @@ public class AppContextCoreInsertData {
 					.loadTosca(fileBase + "init/rsybl_user_managed.xml"));
 
 			OfferedServiceUnit rsyblDynamic = new OfferedServiceUnit(
-					Constants.RSYBL_SERVICE_DYNAMIC, Constants.RSYBL_SERVICE_DYNAMIC, OsuType.EPS.toString(),
+					RSYBL_SERVICE_DYNAMIC, RSYBL_SERVICE_DYNAMIC, OsuType.EPS.toString(),
 					new String[] { Constants.ROLE_CONTROLLER });
 
 			rsyblDynamic.hasPrimitiveOperation(
@@ -223,7 +230,7 @@ public class AppContextCoreInsertData {
 					.loadTosca(fileBase + "init/salsa_user_managed.xml"));
 
 			OfferedServiceUnit salsaDynamic = new OfferedServiceUnit(
-					Constants.SALSA_SERVICE_DYNAMIC, Constants.SALSA_SERVICE_DYNAMIC, OsuType.EPS.toString(),
+					SALSA_SERVICE_DYNAMIC, SALSA_SERVICE_DYNAMIC, OsuType.EPS.toString(),
 					new String[] { Constants.ROLE_DEPLOYER });
 
 			salsaDynamic.setServiceTemplate(new Template(salsaService.getId(), salsaService));

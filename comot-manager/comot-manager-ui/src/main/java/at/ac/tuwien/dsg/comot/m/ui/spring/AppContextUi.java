@@ -16,15 +16,25 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.ui;
+package at.ac.tuwien.dsg.comot.m.ui.spring;
 
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableAsync;
+
+import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCore;
+import at.ac.tuwien.dsg.comot.m.recorder.AppContextServrec;
 
 @Configuration
-@PropertySource({ "file:config/application.properties" })
-@Profile(AppContextUi.CONFIGURABLE)
-public class AppContextConfigurable {
+@EnableAsync
+@PropertySource({ "classpath:path.properties", "${config.path}/application.properties" })
+@Import({ AppContextCore.class, AppContextServrec.class })
+@ComponentScan("at.ac.tuwien.dsg.comot.m.ui")
+public class AppContextUi {
+
+	public static final String CONFIGURABLE = "CONFIGURABLE";
+	public static final String PRECONFIGURED = "PRECONFIGURED";
 
 }

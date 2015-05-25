@@ -16,23 +16,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.ui;
+package at.ac.tuwien.dsg.comot.m.info;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.annotation.EnableAsync;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCore;
-import at.ac.tuwien.dsg.comot.m.recorder.AppContextServrec;
+import at.ac.tuwien.dsg.comot.m.common.Navigator;
+import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
+import at.ac.tuwien.dsg.comot.model.devel.structure.ServiceEntity;
 
-@Configuration
-@EnableAsync
-@Import({ AppContextCore.class, AppContextServrec.class })
-@ComponentScan("at.ac.tuwien.dsg.comot.m.ui")
-public class AppContextUi {
+public class Modifier {
 
-	public static final String CONFIGURABLE = "CONFIGURABLE";
-	public static final String PRECONFIGURED = "PRECONFIGURED";
+	private static final Logger LOG = LoggerFactory.getLogger(Modifier.class);
+
+	public static void replaceSyblDirectives(CloudService from, CloudService to) {
+
+		Navigator navTo = new Navigator(to);
+		Navigator navFrom = new Navigator(from);
+
+		for (ServiceEntity entity : navTo.getAllServiceEntities()) {
+			if (navFrom.getManaged(entity.getId()) != null) {
+
+				ServiceEntity temp = (ServiceEntity) navFrom.getManaged(entity.getId());
+				entity.setDirectives(temp.getDirectives());
+			}
+		}
+
+	}
 
 }

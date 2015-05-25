@@ -18,29 +18,24 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class InfoServiceConstants {
 
-import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
-import at.ac.tuwien.dsg.comot.model.devel.structure.ServiceEntity;
+	public static final String TEMPLATES = "templates";
+	public static final String TEMPLATES_ONE = "templates/{templateId}";
+	public static final String TEMPLATES_ONE_SERVICES = "templates/{templateId}/services";
+	public static final String SERVICES = "services";
+	public static final String SERVICE_ONE = "services/{serviceId}";
+	public static final String SERVICE_ONE_ELASTICITY = "services/{serviceId}/elasticity";
+	public static final String UNIT_INSTANCE_ONE = SERVICE_ONE + "/units/{unitId}/unitInstances/{unitInstanceId}";
 
-public class Modifier {
+	public static final String EPS_INSTANCE_ASSIGNMENT = SERVICE_ONE + "/assignedEpses/{epsId}";
 
-	private static final Logger LOG = LoggerFactory.getLogger(Modifier.class);
+	public static final String EPSES = "epses";
+	public static final String EPS_ONE_INSTANCES = "epses/{epsId}/instances";
 
-	public static void replaceSyblDirectives(CloudService from, CloudService to) {
+	public static final String EPS_INSTANCES_ALL = "epsesInstances";
+	public static final String EPS_INSTANCE_ONE = "epsesInstances/{epsInstanceId}";
 
-		Navigator navTo = new Navigator(to);
-		Navigator navFrom = new Navigator(from);
-
-		for (ServiceEntity entity : navTo.getAllServiceEntities()) {
-			if (navFrom.getManaged(entity.getId()) != null) {
-
-				ServiceEntity temp = (ServiceEntity) navFrom.getManaged(entity.getId());
-				entity.setDirectives(temp.getDirectives());
-			}
-		}
-
-	}
+	public static final String DELETE_ALL = "all";
 
 }

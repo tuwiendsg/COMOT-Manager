@@ -16,7 +16,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.cs.adapter;
+package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
-import at.ac.tuwien.dsg.comot.m.common.enums.ComotEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
 import at.ac.tuwien.dsg.comot.m.common.eps.MonitoringClient;
@@ -40,6 +39,7 @@ import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
 import at.ac.tuwien.dsg.comot.m.common.event.state.Transition;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.ComotEvent;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.type.State;
 

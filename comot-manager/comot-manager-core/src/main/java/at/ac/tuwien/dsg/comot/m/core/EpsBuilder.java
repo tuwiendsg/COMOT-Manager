@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
@@ -55,6 +56,8 @@ public class EpsBuilder extends Processor {
 
 	@Autowired
 	protected ApplicationContext context;
+	@javax.annotation.Resource
+	public Environment env;
 	@Autowired
 	protected InformationClient infoService;
 
@@ -82,7 +85,7 @@ public class EpsBuilder extends Processor {
 		if (infoService.isServiceOfDynamicEps(serviceId)) {
 
 			if (action == Action.CREATED) {
-				String staticDeplId = infoService.instanceIdOfStaticEps(Constants.SALSA_SERVICE_STATIC);
+				String staticDeplId = infoService.instanceIdOfStaticEps(env.getProperty("eps.deployment.central"));
 
 				manager.sendCustom(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(),
 						staticDeplId, null));
@@ -157,8 +160,11 @@ public class EpsBuilder extends Processor {
 					}
 
 					String epsId = infoService.createOsuInstance(osu.getId());
-					EpsAdapterStatic adapter = (EpsAdapterStatic) context.getBean(clazz);
-					adapter.start(epsId, ip, (port != null) ? Integer.valueOf(port) : null);
+
+					if (clazz != null) {
+						EpsAdapterStatic adapter = (EpsAdapterStatic) context.getBean(clazz);
+						adapter.start(epsId, ip, (port != null) ? Integer.valueOf(port) : null);
+					}
 
 					staticEps.add(osu.getId());
 

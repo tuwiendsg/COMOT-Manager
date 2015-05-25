@@ -42,12 +42,6 @@
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
 			<version>2.16</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jersey-container-servlet-core</artifactId>
-					<groupId>org.glassfish.jersey.containers</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -92,10 +86,36 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-
 	</dependencies>
 
+
+	<profiles>
+		<profile>
+			<id>prod</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<env.resources>src/main/config/prod</env.resources>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<env.resources>src/main/config/dev</env.resources>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+				<directory>${env.resources}</directory>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
@@ -112,7 +132,7 @@
 				</executions>
 				<configuration>
 					<finalName>comot-manager.jar</finalName>
-					<port>8380</port>
+					<port>8580</port>
 					<path>/comot</path>
 				</configuration>
 			</plugin>
@@ -131,7 +151,7 @@
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/resources/properties</directory>
-									<filtering>false</filtering>
+									<include>application.properties</include>
 								</resource>
 							</resources>
 						</configuration>
@@ -143,11 +163,32 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${basedir}/target/init</outputDirectory>
+							<outputDirectory>${basedir}/target/config/init</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${basedir}/../resources/init</directory>
 									<filtering>false</filtering>
+								</resource>
+								<resource>
+									<directory>${basedir}/src/main/resources/properties</directory>
+									<include>init.properties</include>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-linux-script</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/scripts</directory>
+									<include>manager-daemon.sh</include>
+									<include>manager-daemon-init.sh</include>
 								</resource>
 							</resources>
 						</configuration>
@@ -156,13 +197,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.glassfish.jersey.containers</groupId>
-				<artifactId>jersey-container-servlet-core</artifactId>
-				<version>2.15</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

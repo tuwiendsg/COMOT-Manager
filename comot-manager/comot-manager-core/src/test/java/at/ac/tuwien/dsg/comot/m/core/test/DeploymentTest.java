@@ -31,11 +31,11 @@ import org.oasis.tosca.Definitions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
+import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.TeAgentAdapter;
 import at.ac.tuwien.dsg.comot.m.cs.UtilsCs;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
@@ -55,7 +55,7 @@ public class DeploymentTest extends AbstractTest {
 
 		UtilsT.sleepSeconds(1);
 
-		staticDeplId = infoService.instanceIdOfStaticEps(Constants.SALSA_SERVICE_STATIC);
+		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
 		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
 
 		LOG.info("aaaaaaaaaaaaaaaaaa " + staticDeplId);
@@ -107,7 +107,7 @@ public class DeploymentTest extends AbstractTest {
 		agent.assertCustomEvent(EpsEvent.EPS_SUPPORT_ASSIGNED.toString());
 
 		assertFalse(deployment.isManaged(serviceId));
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.SALSA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.SALSA_SERVICE_STATIC));
 
 		// DEPLOY when passive
 		assertEquals(State.PASSIVE, lcManager.getCurrentState(serviceId, serviceId));
@@ -138,7 +138,7 @@ public class DeploymentTest extends AbstractTest {
 		// check that really undeployed when PASSIVE
 		assertEquals(State.PASSIVE, lcManager.getCurrentState(serviceId, serviceId));
 		assertFalse(deployment.isManaged(serviceId));
-		assertTrue(infoService.isOsuAssignedToService(serviceId, Constants.SALSA_SERVICE_STATIC));
+		assertTrue(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.SALSA_SERVICE_STATIC));
 
 	}
 
@@ -170,6 +170,6 @@ public class DeploymentTest extends AbstractTest {
 
 		assertEquals(State.PASSIVE, lcManager.getCurrentState(serviceId, serviceId));
 		assertFalse(deployment.isManaged(serviceId));
-		assertFalse(infoService.isOsuAssignedToService(serviceId, Constants.SALSA_SERVICE_STATIC));
+		assertFalse(infoService.isOsuAssignedToService(serviceId, AppContextCoreInsertData.SALSA_SERVICE_STATIC));
 	}
 }

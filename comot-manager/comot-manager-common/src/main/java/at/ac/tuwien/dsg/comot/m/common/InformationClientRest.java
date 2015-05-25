@@ -53,7 +53,7 @@ public class InformationClientRest extends ServiceClient {
 	public String createTemplate(CloudService service) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.TEMPLATES)
+				.path(InfoServiceConstants.TEMPLATES)
 				.request(MediaType.TEXT_PLAIN)
 				.post(Entity.xml(service));
 
@@ -66,7 +66,7 @@ public class InformationClientRest extends ServiceClient {
 	public void removeTemplate(String templateId) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.TEMPLATES_ONE)
+				.path(InfoServiceConstants.TEMPLATES_ONE)
 				.resolveTemplate("templateId", templateId)
 				.request(MediaType.WILDCARD)
 				.delete();
@@ -77,7 +77,7 @@ public class InformationClientRest extends ServiceClient {
 	public List<Template> getTemplates() throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.TEMPLATES)
+				.path(InfoServiceConstants.TEMPLATES)
 				.request(MediaType.WILDCARD)
 				.get();
 
@@ -96,7 +96,7 @@ public class InformationClientRest extends ServiceClient {
 	public String createService(CloudService service) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.SERVICES)
+				.path(InfoServiceConstants.SERVICES)
 				.request(MediaType.TEXT_PLAIN)
 				.post(Entity.xml(service));
 		processResponseStatus(response);
@@ -108,7 +108,7 @@ public class InformationClientRest extends ServiceClient {
 	public String createServiceFromTemplate(String templateId) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.TEMPLATES_ONE_SERVICES)
+				.path(InfoServiceConstants.TEMPLATES_ONE_SERVICES)
 				.resolveTemplate("templateId", templateId)
 				.request(MediaType.TEXT_PLAIN)
 				.post(Entity.text(""));
@@ -121,7 +121,7 @@ public class InformationClientRest extends ServiceClient {
 	public void removeService(String serviceId) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.SERVICE_ONE)
+				.path(InfoServiceConstants.SERVICE_ONE)
 				.resolveTemplate("serviceId", serviceId)
 				.request(MediaType.WILDCARD)
 				.delete();
@@ -132,7 +132,7 @@ public class InformationClientRest extends ServiceClient {
 	public List<CloudService> getServices() throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.SERVICES)
+				.path(InfoServiceConstants.SERVICES)
 				.request(MediaType.APPLICATION_XML)
 				.get();
 		processResponseStatus(response);
@@ -147,7 +147,7 @@ public class InformationClientRest extends ServiceClient {
 	public void reconfigureElasticity(String serviceId, CloudService service) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.SERVICE_ONE_ELASTICITY)
+				.path(InfoServiceConstants.SERVICE_ONE_ELASTICITY)
 				.resolveTemplate("serviceId", serviceId)
 				.request(MediaType.TEXT_PLAIN)
 				.put(Entity.xml(service));
@@ -173,7 +173,7 @@ public class InformationClientRest extends ServiceClient {
 			throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.UNIT_INSTANCE_ONE)
+				.path(InfoServiceConstants.UNIT_INSTANCE_ONE)
 				.resolveTemplate("serviceId", serviceId)
 				.resolveTemplate("unitId", unitId)
 				.resolveTemplate("unitInstanceId", uInst.getId())
@@ -188,7 +188,7 @@ public class InformationClientRest extends ServiceClient {
 	public void removeUnitInstance(String serviceId, String uInstId) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.UNIT_INSTANCE_ONE)
+				.path(InfoServiceConstants.UNIT_INSTANCE_ONE)
 				.resolveTemplate("serviceId", serviceId)
 				.resolveTemplate("unitId", "ANY")
 				.resolveTemplate("unitInstanceId", uInstId)
@@ -203,7 +203,7 @@ public class InformationClientRest extends ServiceClient {
 	public String addOsu(OfferedServiceUnit osu) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPSES)
+				.path(InfoServiceConstants.EPSES)
 				.request(MediaType.WILDCARD)
 				.post(Entity.xml(osu));
 
@@ -217,7 +217,7 @@ public class InformationClientRest extends ServiceClient {
 	public List<OfferedServiceUnit> getOsus() throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPSES)
+				.path(InfoServiceConstants.EPSES)
 				.request(MediaType.APPLICATION_XML)
 				.get();
 
@@ -233,7 +233,7 @@ public class InformationClientRest extends ServiceClient {
 	public List<OsuInstance> getOsuInstances() throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPS_INSTANCES_ALL)
+				.path(InfoServiceConstants.EPS_INSTANCES_ALL)
 				.request(MediaType.APPLICATION_XML)
 				.get();
 
@@ -252,7 +252,7 @@ public class InformationClientRest extends ServiceClient {
 		String body = (optionalServiceInstanceId == null) ? "" : optionalServiceInstanceId + " " + osuInstanceId;
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPS_ONE_INSTANCES)
+				.path(InfoServiceConstants.EPS_ONE_INSTANCES)
 				.resolveTemplate("epsId", osuId)
 				.request(MediaType.WILDCARD)
 				.post(Entity.text(body));
@@ -267,7 +267,7 @@ public class InformationClientRest extends ServiceClient {
 	public void removeOsuInatance(String osuInstanceId) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPS_INSTANCE_ONE)
+				.path(InfoServiceConstants.EPS_INSTANCE_ONE)
 				.resolveTemplate("epsInstanceId", osuInstanceId)
 				.request(MediaType.WILDCARD)
 				.delete();
@@ -280,7 +280,7 @@ public class InformationClientRest extends ServiceClient {
 		LOG.info("assignEps({} {})", serviceId, osuInstanceId);
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPS_INSTANCE_ASSIGNMENT)
+				.path(InfoServiceConstants.EPS_INSTANCE_ASSIGNMENT)
 				.resolveTemplate("serviceId", serviceId)
 				.resolveTemplate("epsId", osuInstanceId)
 				.request(MediaType.WILDCARD)
@@ -292,7 +292,7 @@ public class InformationClientRest extends ServiceClient {
 	public void removeEpsAssignment(String instanceId, String osuInstanceId) throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.EPS_INSTANCE_ASSIGNMENT)
+				.path(InfoServiceConstants.EPS_INSTANCE_ASSIGNMENT)
 				.resolveTemplate("serviceId", instanceId)
 				.resolveTemplate("epsId", osuInstanceId)
 				.request(MediaType.WILDCARD)
@@ -304,7 +304,7 @@ public class InformationClientRest extends ServiceClient {
 	public void deleteAll() throws EpsException {
 
 		Response response = client.target(baseUri)
-				.path(Constants.DELETE_ALL)
+				.path(InfoServiceConstants.DELETE_ALL)
 				.request(MediaType.WILDCARD)
 				.delete();
 

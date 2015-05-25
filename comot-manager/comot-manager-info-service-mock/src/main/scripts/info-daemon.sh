@@ -17,6 +17,7 @@ DAEMON=infoServiceMock.jar
 PIDDIR=/tmp/
 PIDFILE=$PIDDIR/info-service.pid
 LOG_DIR=/tmp/info-service
+PORT=8480
 
 test -x $JAVA -a -f $DAEMONDIR/$DAEMON || echo "test -x $JAVA -a -f $DAEMONDIR/$DAEMON failed"  
 test -x $JAVA -a -f $DAEMONDIR/$DAEMON || exit 0
@@ -29,7 +30,7 @@ case "$1" in
 		log_progress_msg "info-service"
 		# Make sure we have our PIDDIR, even if it's on a tmpfs
 		# install -o root -g root -m 755 -d $PIDDIR
-        if ! start-stop-daemon --start --chdir $DAEMONDIR --quiet --pidfile $PIDFILE --make-pidfile --background --exec $JAVA -- -DLOG_DIR=$LOG_DIR -jar $DAEMON; then
+        if ! start-stop-daemon --start --chdir $DAEMONDIR --quiet --pidfile $PIDFILE --make-pidfile --background --exec $JAVA -- -DLOG_DIR=$LOG_DIR -jar $DAEMON -httpPort $PORT; then
 		    log_end_msg 1
 		    exit 1
 		fi

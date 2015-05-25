@@ -16,7 +16,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.common.enums;
+package at.ac.tuwien.dsg.comot.m.cs.adapter;
 
 import at.ac.tuwien.dsg.csdg.outputProcessing.eventsNotification.ActionEvent;
 import at.ac.tuwien.dsg.csdg.outputProcessing.eventsNotification.ActionPlanEvent;

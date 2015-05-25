@@ -45,6 +45,7 @@ import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
+import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.LoadGenerator;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.TeAgentAdapter;
 import at.ac.tuwien.dsg.comot.m.cs.UtilsCs;
@@ -76,9 +77,9 @@ public class ControllerTest extends AbstractTest {
 	@Before
 	public void setUp() throws Exception {
 
-		staticDeplId = infoService.instanceIdOfStaticEps(Constants.SALSA_SERVICE_STATIC);
-		staticMonitoringId = infoService.instanceIdOfStaticEps(Constants.MELA_SERVICE_STATIC);
-		staticControlId = infoService.instanceIdOfStaticEps(Constants.RSYBL_SERVICE_STATIC);
+		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
+		staticMonitoringId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.MELA_SERVICE_STATIC);
+		staticControlId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.RSYBL_SERVICE_STATIC);
 		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
 		generator = new LoadGenerator();
 

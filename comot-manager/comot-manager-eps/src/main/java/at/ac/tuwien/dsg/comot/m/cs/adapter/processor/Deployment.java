@@ -16,7 +16,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.cs.adapter;
+package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
 import java.io.IOException;
 import java.util.ArrayList;

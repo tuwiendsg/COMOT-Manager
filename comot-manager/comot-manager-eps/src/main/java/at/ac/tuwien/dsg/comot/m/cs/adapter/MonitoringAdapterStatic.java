@@ -16,15 +16,34 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.ui;
+package at.ac.tuwien.dsg.comot.m.cs.adapter;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@PropertySource({ "classpath:properties/application.properties" })
-@Profile(AppContextUi.PRECONFIGURED)
-public class AppContextPreconfigured {
+import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
+import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
+import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Monitoring;
+
+@Component
+@Scope("prototype")
+public class MonitoringAdapterStatic implements EpsAdapterStatic {
+
+	@Autowired
+	protected Monitoring processor;
+	@Autowired
+	protected PerInstanceQueueManager manager;
+	@Autowired
+	protected InformationClient infoService;
+
+	@Override
+	public void start(String participantId, String host, Integer port) throws Exception {
+
+		processor.setHostAndPort(host, port);
+
+		manager.start(participantId, processor);
+	}
 
 }

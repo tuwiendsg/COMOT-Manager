@@ -16,8 +16,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.core.adapter;
+package at.ac.tuwien.dsg.comot.m.cs.adapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,14 +27,16 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
 import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
-import at.ac.tuwien.dsg.comot.m.cs.adapter.Control;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Deployment;
 
 @Component
 @Scope("prototype")
-public class ControlAdapterStatic implements EpsAdapterStatic {
+public class DeploymentAdapterStatic implements EpsAdapterStatic {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DeploymentAdapterStatic.class);
 
 	@Autowired
-	protected Control processor;
+	protected Deployment processor;
 	@Autowired
 	protected PerInstanceQueueManager manager;
 	@Autowired

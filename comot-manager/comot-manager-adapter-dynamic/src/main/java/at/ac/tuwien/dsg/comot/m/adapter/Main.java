@@ -42,9 +42,9 @@ import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
-import at.ac.tuwien.dsg.comot.m.cs.adapter.Control;
-import at.ac.tuwien.dsg.comot.m.cs.adapter.Deployment;
-import at.ac.tuwien.dsg.comot.m.cs.adapter.Monitoring;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Control;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Deployment;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Monitoring;
 
 public class Main {
 
