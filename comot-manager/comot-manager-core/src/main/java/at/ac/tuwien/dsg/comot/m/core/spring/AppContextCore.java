@@ -78,6 +78,8 @@ public class AppContextCore {
 	@Bean
 	public ConnectionFactory connectionFactory() {
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(env.getProperty("uri.broker.host"));
+		connectionFactory.setUsername(env.getProperty("uri.broker.username"));
+		connectionFactory.setPassword(env.getProperty("uri.broker.password"));
 		return connectionFactory;
 	}
 

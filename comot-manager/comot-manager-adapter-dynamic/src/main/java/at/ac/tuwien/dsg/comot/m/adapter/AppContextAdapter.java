@@ -85,6 +85,8 @@ public class AppContextAdapter {
 		LOG.info("setting connection to message broker: {}", brokerHost);
 
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(brokerHost);
+		connectionFactory.setUsername(env.getProperty("uri.broker.username"));
+		connectionFactory.setPassword(env.getProperty("uri.broker.password"));
 		return connectionFactory;
 	}
 

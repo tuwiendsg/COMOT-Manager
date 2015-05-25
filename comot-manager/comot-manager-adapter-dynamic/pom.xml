@@ -22,6 +22,10 @@
 			<groupId>at.ac.tuwien.dsg.comot</groupId>
 			<artifactId>comot-manager-adapter</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>at.ac.tuwien.dsg.comot</groupId>
+			<artifactId>comot-manager-eps</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -14,13 +14,12 @@
 	</parent>
 
 	<dependencies>
-	 
+
 		<dependency>
 			<groupId>com.wordnik</groupId>
 			<artifactId>swagger-jersey2-jaxrs</artifactId>
 			<version>1.5.3-M1</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
@@ -132,6 +131,22 @@
 							<resources>
 								<resource>
 									<directory>${basedir}/src/main/resources/properties</directory>
+									<filtering>false</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-init-data</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/init</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/../resources/init</directory>
 									<filtering>false</filtering>
 								</resource>
 							</resources>

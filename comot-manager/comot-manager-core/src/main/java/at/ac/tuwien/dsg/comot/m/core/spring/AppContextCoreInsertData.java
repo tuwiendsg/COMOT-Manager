@@ -18,7 +18,6 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.core.spring;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -76,6 +75,8 @@ public class AppContextCoreInsertData {
 	public Object insertData() throws AmqpException, JAXBException, ComotException {
 
 		LOG.info("Inserting EPS");
+		infoService.deleteAll();
+
 		setUpTestData();
 
 		return null;
@@ -155,17 +156,20 @@ public class AppContextCoreInsertData {
 				new ComotCustomEvent("Start controller", ComotEvent.RSYBL_START.toString(), false));
 		control.hasPrimitiveOperation(
 				new ComotCustomEvent("Stop controller", ComotEvent.RSYBL_STOP.toString(), false));
-
-		coordinator.addEps(deployment);
-		coordinator.addEps(monitoring);
-		coordinator.addEps(control);
+		try {
+			coordinator.addEps(deployment);
+			coordinator.addEps(monitoring);
+			coordinator.addEps(control);
+		} catch (Exception e) {
+			LOG.error("{}", e);
+		}
 
 		// DYNAMIC EPS MELA
 
 		try {
 
 			CloudService melaService = mapperTosca.createModel(UtilsCs
-					.loadTosca(fileBase + "adapterMela/mela_tosca_with_adapter_from_salsa.xml"));
+					.loadTosca(fileBase + "init/mela_user_managed.xml"));
 
 			OfferedServiceUnit monitoringDynamic = new OfferedServiceUnit(
 					Constants.MELA_SERVICE_DYNAMIC, Constants.MELA_SERVICE_DYNAMIC, OsuType.EPS.toString(),
@@ -182,14 +186,14 @@ public class AppContextCoreInsertData {
 
 			coordinator.addEps(monitoringDynamic);
 
-		} catch (JAXBException | IOException e) {
+		} catch (Exception e) {
 			LOG.error("{}", e);
 		}
 
 		// DYNAMIC EPS RSYBL
 		try {
 			CloudService rsyblService = mapperTosca.createModel(UtilsCs
-					.loadTosca(fileBase + "adapterRsybl/rsybl_mela_with_adapter_tosca.xml"));
+					.loadTosca(fileBase + "init/rsybl_user_managed.xml"));
 
 			OfferedServiceUnit rsyblDynamic = new OfferedServiceUnit(
 					Constants.RSYBL_SERVICE_DYNAMIC, Constants.RSYBL_SERVICE_DYNAMIC, OsuType.EPS.toString(),
@@ -209,14 +213,14 @@ public class AppContextCoreInsertData {
 
 			coordinator.addEps(rsyblDynamic);
 
-		} catch (JAXBException | IOException e) {
+		} catch (Exception e) {
 			LOG.error("{}", e);
 		}
 
 		// DYNAMIC EPS SALSA
 		try {
 			CloudService salsaService = mapperTosca.createModel(UtilsCs
-					.loadTosca(fileBase + "adapterSalsa/salsa_tosca.xml"));
+					.loadTosca(fileBase + "init/salsa_user_managed.xml"));
 
 			OfferedServiceUnit salsaDynamic = new OfferedServiceUnit(
 					Constants.SALSA_SERVICE_DYNAMIC, Constants.SALSA_SERVICE_DYNAMIC, OsuType.EPS.toString(),
@@ -226,14 +230,14 @@ public class AppContextCoreInsertData {
 
 			coordinator.addEps(salsaDynamic);
 
-		} catch (JAXBException | IOException e) {
+		} catch (Exception e) {
 			LOG.error("{}", e);
 		}
 
 		try {
 			infoService.createTemplate(mapperTosca.createModel(UtilsCs
 					.loadTosca(fileBase + "init/HelloElasticity.xml")));
-		} catch (JAXBException | IOException e) {
+		} catch (Exception e) {
 			LOG.error("{}", e);
 		}
 

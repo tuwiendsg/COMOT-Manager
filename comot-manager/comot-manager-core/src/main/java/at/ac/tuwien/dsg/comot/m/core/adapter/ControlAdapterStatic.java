@@ -23,9 +23,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
-import at.ac.tuwien.dsg.comot.m.adapter.processor.Control;
 import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.Control;
 
 @Component
 @Scope("prototype")

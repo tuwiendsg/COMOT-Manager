@@ -57,6 +57,7 @@ define(function(require) {
 		// life-cycle
 		deactivate : function() {
 			if (typeof source.close === 'function') {
+				console.log("Closing SSE connection");
 				source.close();
 			}
 		},

@@ -35,9 +35,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Manager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
-import at.ac.tuwien.dsg.comot.m.adapter.processor.Control;
-import at.ac.tuwien.dsg.comot.m.adapter.processor.Deployment;
-import at.ac.tuwien.dsg.comot.m.adapter.processor.Monitoring;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
@@ -45,6 +42,9 @@ import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.Control;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.Deployment;
+import at.ac.tuwien.dsg.comot.m.cs.adapter.Monitoring;
 
 public class Main {
 
