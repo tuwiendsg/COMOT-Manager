@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
 import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Deployment;
 
 @Component
@@ -39,8 +38,6 @@ public class DeploymentAdapterStatic implements EpsAdapterStatic {
 	protected Deployment processor;
 	@Autowired
 	protected PerInstanceQueueManager manager;
-	@Autowired
-	protected InformationClient infoService;
 
 	@Override
 	public void start(String participantId, String host, Integer port) throws Exception {

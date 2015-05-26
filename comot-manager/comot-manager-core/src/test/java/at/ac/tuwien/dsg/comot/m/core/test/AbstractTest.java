@@ -18,6 +18,8 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.core.test;
 
+import javax.annotation.Resource;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -51,8 +53,8 @@ public abstract class AbstractTest {
 
 	@Autowired
 	protected ApplicationContext context;
-	@Autowired
-	protected Environment env;
+	@Resource
+	public Environment env;
 	@Autowired
 	protected GraphDatabaseService db;
 	@Autowired
@@ -79,7 +81,7 @@ public abstract class AbstractTest {
 	@BeforeClass
 	public static void setUpClass() {
 		tomcat = new EmbeddedTomcat();
-		tomcat.start(8080);
+		tomcat.start(8480);
 		tomcat.deploy("info", "../comot-manager-info-service-mock/src/main/webapp");
 	}
 

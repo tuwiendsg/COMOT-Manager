@@ -18,6 +18,11 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.adapter.general;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
@@ -29,10 +34,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import at.ac.tuwien.dsg.comot.m.common.Constants;
+import at.ac.tuwien.dsg.comot.m.common.MngPath;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
+import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
+import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
+import at.ac.tuwien.dsg.comot.model.devel.structure.ServiceEntity;
+import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
+import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
 
 public abstract class Manager implements IManager {
 
@@ -53,7 +64,21 @@ public abstract class Manager implements IManager {
 	protected String participantId;
 	protected IProcessor processor;
 
-	public void start(String participantId, IProcessor processor) throws Exception {
+	public void startStandalone(String baseUri, OfferedServiceUnit eps, IProcessor processor) {
+
+		Client client = ClientBuilder.newClient();
+
+		Response response = client.target(baseUri)
+				.path(MngPath.EPS_EXTERNAL)
+				.request(MediaType.WILDCARD)
+				.post(Entity.xml(eps));
+		String epsInstanceId = response.readEntity(String.class);
+		client.close();
+
+		start(epsInstanceId, processor);
+	}
+
+	public void start(String participantId, IProcessor processor) {
 		this.participantId = participantId;
 		this.processor = processor;
 
@@ -69,7 +94,25 @@ public abstract class Manager implements IManager {
 	public abstract void stop();
 
 	@Override
-	public void sendLifeCycle(LifeCycleEvent event) throws JAXBException {
+	public void sendLifeCycleEvent(String serviceId, String groupId, Action action) throws JAXBException {
+		sendLifeCycle(new LifeCycleEvent(serviceId, groupId, action));
+	}
+
+	@Override
+	public void sendLifeCycleEvent(String serviceId, String groupId, Action action, String parentId,
+			ServiceEntity entity)
+			throws JAXBException {
+		sendLifeCycle(new LifeCycleEventModifying(serviceId, groupId, action, parentId, entity));
+	}
+
+	@Override
+	public void sendLifeCycleEvent(String serviceId, String groupId, Action action, String parentId,
+			UnitInstance instance)
+			throws JAXBException {
+		sendLifeCycle(new LifeCycleEventModifying(serviceId, groupId, action, parentId, instance));
+	}
+
+	protected void sendLifeCycle(LifeCycleEvent event) throws JAXBException {
 
 		event.setOrigin(getId());
 		event.setTime(System.currentTimeMillis());
@@ -84,13 +127,13 @@ public abstract class Manager implements IManager {
 	}
 
 	@Override
-	public void sendCustom(CustomEvent event) throws JAXBException {
+	public void sendCustomEvent(String serviceId, String groupId, String eventName, String epsId, String message)
+			throws JAXBException {
 
-		event.setOrigin(getId());
-		event.setTime(System.currentTimeMillis());
+		CustomEvent event = new CustomEvent(serviceId, groupId, eventName, getId(), System.currentTimeMillis(), epsId,
+				message);
 
-		String bindingKey = event.getServiceId() + "." + event.getClass().getSimpleName() + "."
-				+ event.getCustomEvent() + "." + event.getGroupId();
+		String bindingKey = serviceId + "." + event.getClass().getSimpleName() + "." + eventName + "." + groupId;
 
 		LOG.info(logId() + "EVENT-CUST key={}", bindingKey);
 
@@ -98,7 +141,7 @@ public abstract class Manager implements IManager {
 	}
 
 	@Override
-	public void sendException(String serviceId, Exception e) throws JAXBException {
+	public void sendExceptionEvent(String serviceId, Exception e) throws JAXBException {
 
 		ExceptionMessage msg = new ExceptionMessage(serviceId, getId(), System.currentTimeMillis(), e);
 

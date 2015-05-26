@@ -48,7 +48,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.MngPath;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.core.Coordinator;
@@ -63,8 +65,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 @Service
 @Consumes({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
 @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
-@Path("/eps")
-@Api(value = "/eps", description = "Management of Elastic Platform Services (EPSs)")
+@Path(MngPath.EPS)
+@Api(value = MngPath.EPS, description = "Management of Elastic Platform Services (EPSs)")
 public class EpsResource {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EpsResource.class);
@@ -80,16 +82,17 @@ public class EpsResource {
 	private static final String UPLOADS_DIR = "uploads/";
 
 	@POST
+	@Path(MngPath.EPS_EXTERNAL)
 	@Produces(MediaType.TEXT_PLAIN)
 	@ApiOperation(
-			value = "Add new EPS",
+			value = "Add new external EPS. Returns the participantId/epsInstanceId.",
 			response = String.class)
 	public Response addEps(
 			@ApiParam(value = "Description of the EPS", required = true) OfferedServiceUnit osu)
 			throws Exception {
 
-		String epsId = coordinator.addEps(osu);
-		return Response.ok(epsId).build();
+		String epsInstanceId = coordinator.addStaticEps(osu);
+		return Response.ok(epsInstanceId).build();
 	}
 
 	@POST
@@ -153,7 +156,7 @@ public class EpsResource {
 		} else if (InformationClient.EXTERNAL.equals(type)) {
 			for (Iterator<OfferedServiceUnit> iterator = allEps.iterator(); iterator.hasNext();) {
 				OfferedServiceUnit osu = iterator.next();
-				if (InformationClient.isDynamicEps(osu)) {
+				if (InfoServiceUtils.isDynamicEps(osu)) {
 					iterator.remove();
 				}
 			}
@@ -161,7 +164,7 @@ public class EpsResource {
 		} else if (InformationClient.USER_MANAGED.equals(type)) {
 			for (Iterator<OfferedServiceUnit> iterator = allEps.iterator(); iterator.hasNext();) {
 				OfferedServiceUnit osu = iterator.next();
-				if (!InformationClient.isDynamicEps(osu)) {
+				if (!InfoServiceUtils.isDynamicEps(osu)) {
 					iterator.remove();
 				}
 			}
@@ -171,6 +174,21 @@ public class EpsResource {
 		}
 
 		return Response.ok(allEps.toArray(new OfferedServiceUnit[allEps.size()])).build();
+	}
+
+	@GET
+	@Consumes(MediaType.WILDCARD)
+	@Path("/{epsId}/instances")
+	@ApiOperation(
+			value = "Get EPS instances of a single EPS",
+			response = OsuInstance.class)
+	public Response getEpsInstancesOfOneEps(
+			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId)
+			throws EpsException {
+
+		List<OsuInstance> epsInstances = infoServ.getOsuInstancesForOsu(epsId);
+
+		return Response.ok(epsInstances.toArray(new OsuInstance[epsInstances.size()])).build();
 	}
 
 	@GET

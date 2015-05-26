@@ -88,8 +88,22 @@ public class PerInstanceQueueManager extends Manager {
 
 		admin.declareQueue(new Queue(queueNameInstance(instanceId), false, false, true));
 
-		for (Binding binding : processor.getBindings(queueNameInstance(instanceId), instanceId)) {
-			admin.declareBinding(binding);
+		String queueName = queueNameInstance(instanceId);
+		Bindings bindings = processor.getBindings(instanceId);
+
+		for (String routingKey : bindings.getLifecycle()) {
+			admin.declareBinding(
+					new Binding(queueName, DestinationType.QUEUE, Constants.EXCHANGE_LIFE_CYCLE, routingKey, null));
+		}
+
+		for (String routingKey : bindings.getCustom()) {
+			admin.declareBinding(
+					new Binding(queueName, DestinationType.QUEUE, Constants.EXCHANGE_CUSTOM_EVENT, routingKey, null));
+		}
+
+		for (String routingKey : bindings.getException()) {
+			admin.declareBinding(
+					new Binding(queueName, DestinationType.QUEUE, Constants.EXCHANGE_EXCEPTIONS, routingKey, null));
 		}
 
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
@@ -119,8 +133,8 @@ public class PerInstanceQueueManager extends Manager {
 						startServiceInstanceListener(serviceId);
 						infoService.assignEps(serviceId, participantId);
 
-						sendCustom(new CustomEvent(serviceId, groupId, EpsEvent.EPS_SUPPORT_ASSIGNED.toString(),
-								participantId, null));
+						sendCustomEvent(serviceId, groupId, EpsEvent.EPS_SUPPORT_ASSIGNED.toString(), participantId,
+								null);
 					}
 
 				} else if (action.equals(EpsEvent.EPS_SUPPORT_REMOVED.toString())) {

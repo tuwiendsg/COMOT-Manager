@@ -19,11 +19,9 @@
 package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -32,12 +30,12 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.IManager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
@@ -79,41 +77,32 @@ public class Deployment extends Processor {
 
 		super.init(dispatcher, participantId);
 		helper.setDeploymentAdapter(this);
-		helper.setAdapterId(getId());
 		helper.setDeployment(deployment);
-
 	}
 
 	public void setHostAndPort(String host, int port) {
 		deployment.setHostAndPort(host, port);
 	}
 
+	public IManager getManager() {
+		return manager;
+	}
+
 	@Override
-	public List<Binding> getBindings(String queueName, String instanceId) {
+	public Bindings getBindings(String sId) {
 
-		List<Binding> bindings = new ArrayList<>();
+		return new Bindings().addLifecycle(sId + "." + Action.START + "." + Type.SERVICE + ".#")
+				.addLifecycle(sId + "." + Action.STOP + "." + Type.SERVICE + ".#")
+				.addLifecycle(
+						sId + "." + Action.DEPLOYMENT_STARTED + "." + Type.SERVICE + ".TRUE.*.*." + getId() + ".#")
+				.addLifecycle(
+						sId + "." + Action.UNDEPLOYMENT_STARTED + "." + Type.SERVICE + ".TRUE.*.*." + getId() + ".#")
+				.addLifecycle(sId + "." + Action.ELASTIC_CHANGE_STARTED + ".#")
+				.addLifecycle(sId + "." + Action.ELASTIC_CHANGE_FINISHED + ".#")
+				.addLifecycle(sId + "." + Action.TERMINATE + ".#")
 
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.START + "." + Type.SERVICE + ".#"));
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.STOP + "." + Type.SERVICE + ".#"));
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.DEPLOYMENT_STARTED + "." + Type.SERVICE + ".TRUE.*.*." + getId() + ".#"));
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.UNDEPLOYMENT_STARTED + "." + Type.SERVICE + ".TRUE.*.*." + getId() + ".#"));
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.ELASTIC_CHANGE_STARTED + ".#"));
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.ELASTIC_CHANGE_FINISHED + ".#"));
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + "." + Action.TERMINATE + ".#"));
-
-		bindings.add(bindingCustom(queueName,
-				instanceId + "." + EpsEvent.EPS_SUPPORT_REMOVED + "." + Type.SERVICE + "." + getId()));
-		bindings.add(bindingCustom(queueName,
-				instanceId + "." + EpsEvent.EPS_SUPPORT_ASSIGNED + "." + Type.SERVICE + "." + getId()));
-
-		return bindings;
+				.addCustom(sId + "." + EpsEvent.EPS_SUPPORT_REMOVED + "." + Type.SERVICE + "." + getId())
+				.addCustom(sId + "." + EpsEvent.EPS_SUPPORT_ASSIGNED + "." + Type.SERVICE + "." + getId());
 	}
 
 	@Override
@@ -123,10 +112,10 @@ public class Deployment extends Processor {
 		if (action == Action.START && !deployment.isManaged(serviceId)) {
 			LOG.info("manager {} ", manager);
 
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, groupId, Action.DEPLOYMENT_STARTED));
+			manager.sendLifeCycleEvent(serviceId, groupId, Action.DEPLOYMENT_STARTED);
 
 		} else if (action == Action.STOP && deployment.isManaged(serviceId)) {
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, groupId, Action.UNDEPLOYMENT_STARTED));
+			manager.sendLifeCycleEvent(serviceId, groupId, Action.UNDEPLOYMENT_STARTED);
 
 		} else if (action == Action.DEPLOYMENT_STARTED) {
 			deployInstance(serviceId);
@@ -162,7 +151,7 @@ public class Deployment extends Processor {
 
 		} else if (action == Action.TERMINATE && deployment.isManaged(serviceId)) {
 
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, groupId, Action.UNDEPLOYMENT_STARTED));
+			manager.sendLifeCycleEvent(serviceId, groupId, Action.UNDEPLOYMENT_STARTED);
 
 		}
 	}
@@ -175,7 +164,7 @@ public class Deployment extends Processor {
 
 		if (action == EpsEvent.EPS_SUPPORT_REMOVED && deployment.isManaged(serviceId)) {
 
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.UNDEPLOYMENT_STARTED));
+			manager.sendLifeCycleEvent(serviceId, serviceId, Action.UNDEPLOYMENT_STARTED);
 
 			unDeployInstance(serviceId);
 
@@ -213,7 +202,7 @@ public class Deployment extends Processor {
 			unit.setInstances(new HashSet<UnitInstance>());
 		}
 
-		manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.UNDEPLOYED));
+		manager.sendLifeCycleEvent(serviceId, serviceId, Action.UNDEPLOYED);
 	}
 
 	public class StatusTask {

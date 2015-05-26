@@ -18,14 +18,11 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.core;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
-import org.springframework.amqp.core.Binding;
-
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.event.AbstractEvent;
@@ -48,15 +45,12 @@ public abstract class CoordinatorAdapter extends Processor {
 	protected ComotMessage response;
 
 	@Override
-	public List<Binding> getBindings(String queueName, String notUsed) {
+	public Bindings getBindings(String notUsed) {
 
-		List<Binding> bindings = new ArrayList<>();
-
-		bindings.add(bindingLifeCycle(queueName, serviceId + ".#"));
-		bindings.add(bindingCustom(queueName, serviceId + ".#"));
-		bindings.add(bindingException(queueName, serviceId + ".#"));
-
-		return bindings;
+		return new Bindings()
+				.addLifecycle(serviceId + ".#")
+				.addCustom(serviceId + ".#")
+				.addException(serviceId + ".#");
 	}
 
 	public CoordinatorAdapter(String serviceId, Coordinator coordinator) {
@@ -91,8 +85,7 @@ public abstract class CoordinatorAdapter extends Processor {
 
 	public abstract void sendInternal() throws JAXBException;
 
-	public void send() throws ComotException, InterruptedException, JAXBException,
-			ComotLifecycleException {
+	public void send() throws InterruptedException, JAXBException, ComotException {
 
 		sendInternal();
 

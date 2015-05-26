@@ -28,5 +28,4 @@ public enum EpsEvent {
 	EPS_SUPPORT_ASSIGNED,
 	EPS_SUPPORT_REMOVED,
 
-	EPS_REFRESHED;
 }

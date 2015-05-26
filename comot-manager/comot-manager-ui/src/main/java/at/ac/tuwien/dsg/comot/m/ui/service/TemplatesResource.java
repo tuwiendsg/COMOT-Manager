@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
@@ -134,7 +135,7 @@ public class TemplatesResource {
 
 		Set<String> dynamicEpsServices = new HashSet<String>();
 		for (OfferedServiceUnit osu : infoServ.getOsus()) {
-			if (InformationClient.isDynamicEps(osu)) {
+			if (InfoServiceUtils.isDynamicEps(osu)) {
 				dynamicEpsServices.add(osu.getServiceTemplate().getId());
 			}
 		}

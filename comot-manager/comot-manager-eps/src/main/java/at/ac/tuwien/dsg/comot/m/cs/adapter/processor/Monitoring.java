@@ -19,15 +19,13 @@
 package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
@@ -57,20 +55,16 @@ public class Monitoring extends Processor {
 	}
 
 	@Override
-	public List<Binding> getBindings(String queueName, String instanceId) {
+	public Bindings getBindings(String instanceId) {
 
-		List<Binding> bindings = new ArrayList<>();
+		return new Bindings()
+				.addLifecycle(instanceId + ".*.*.TRUE." + State.DEPLOYING + "." + State.RUNNING + ".#")
+				.addLifecycle(instanceId + "." + Action.MAINTENANCE_FINISHED + ".#")
+				.addLifecycle(instanceId + "." + Action.ELASTIC_CHANGE_FINISHED + ".#")
+				.addLifecycle(instanceId + ".*.*.TRUE.*." + State.PASSIVE + ".#")
+				.addLifecycle(instanceId + "." + Action.TERMINATE + ".#")
 
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + ".*.*.TRUE." + State.DEPLOYING + "." + State.RUNNING + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.MAINTENANCE_FINISHED + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.ELASTIC_CHANGE_FINISHED + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + ".*.*.TRUE.*." + State.PASSIVE + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.TERMINATE + ".#"));
-
-		bindings.add(bindingCustom(queueName, instanceId + ".*." + "." + Type.SERVICE + "." + getId()));
-
-		return bindings;
+				.addCustom(instanceId + ".*." + "." + Type.SERVICE + "." + getId());
 	}
 
 	@Override

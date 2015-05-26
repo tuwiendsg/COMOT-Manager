@@ -52,6 +52,7 @@ import org.springframework.stereotype.Service;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Manager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.SingleQueueManager;
+import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
@@ -365,7 +366,7 @@ public class ServicesResource {
 
 		Set<String> dynamicEpsServices = new HashSet<String>();
 		for (OsuInstance osuInstance : infoServ.getOsuInstances()) {
-			if (InformationClient.isDynamicEps(osuInstance.getOsu())) {
+			if (InfoServiceUtils.isDynamicEps(osuInstance.getOsu())) {
 				dynamicEpsServices.add(osuInstance.getService().getId());
 			}
 		}

@@ -19,11 +19,9 @@
 package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,11 +29,11 @@ import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
@@ -80,22 +78,18 @@ public class Control extends Processor implements ControlEventsListener {
 	}
 
 	@Override
-	public List<Binding> getBindings(String queueName, String instanceId) {
+	public Bindings getBindings(String serviceId) {
 
-		List<Binding> bindings = new ArrayList<>();
+		return new Bindings()
+				.addLifecycle(serviceId + ".*.*.TRUE." + State.DEPLOYING + "." + State.RUNNING + ".#")
+				.addLifecycle(serviceId + "." + Action.MAINTENANCE_STARTED + ".#")
+				.addLifecycle(serviceId + ".*.*.TRUE.*." + State.PASSIVE + ".#")
+				.addLifecycle(serviceId + "." + Action.RECONFIGURE_ELASTICITY + ".#")
+				.addLifecycle(serviceId + "." + Action.START_CONTROLLER + ".#")
+				.addLifecycle(serviceId + "." + Action.STOP_CONTROLLER + ".#")
+				.addLifecycle(serviceId + "." + Action.TERMINATE + ".#")
 
-		bindings.add(bindingLifeCycle(queueName,
-				instanceId + ".*.*.TRUE." + State.DEPLOYING + "." + State.RUNNING + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.MAINTENANCE_STARTED + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + ".*.*.TRUE.*." + State.PASSIVE + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.RECONFIGURE_ELASTICITY + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.START_CONTROLLER + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.STOP_CONTROLLER + ".#"));
-		bindings.add(bindingLifeCycle(queueName, instanceId + "." + Action.TERMINATE + ".#"));
-
-		bindings.add(bindingCustom(queueName, instanceId + ".*." + "." + Type.SERVICE + "." + getId()));
-
-		return bindings;
+				.addCustom(serviceId + ".*." + "." + Type.SERVICE + "." + getId());
 	}
 
 	@Override
@@ -130,7 +124,7 @@ public class Control extends Processor implements ControlEventsListener {
 
 			Thread.sleep(TIMEOUT);
 
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, action));
+			manager.sendLifeCycleEvent(serviceId, serviceId, action);
 
 		} else if (action == Action.TERMINATE) {
 
@@ -266,13 +260,13 @@ public class Control extends Processor implements ControlEventsListener {
 				ActionPlanEvent apEvent = (ActionPlanEvent) event;
 
 				if (apEvent.getStage() == IEvent.Stage.START) {
-					manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.ELASTIC_CHANGE_STARTED));
-					manager.sendCustom(new CustomEvent(serviceId, serviceId, customEventName, null, optionalMsg));
+					manager.sendLifeCycleEvent(serviceId, serviceId, Action.ELASTIC_CHANGE_STARTED);
+					manager.sendCustomEvent(serviceId, serviceId, customEventName, null, optionalMsg);
 
 				} else if (apEvent.getStage() == IEvent.Stage.FINISHED || apEvent.getStage() == IEvent.Stage.FINISHED) {
 
-					manager.sendCustom(new CustomEvent(serviceId, serviceId, customEventName, null, optionalMsg));
-					manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.ELASTIC_CHANGE_FINISHED));
+					manager.sendCustomEvent(serviceId, serviceId, customEventName, null, optionalMsg);
+					manager.sendLifeCycleEvent(serviceId, serviceId, Action.ELASTIC_CHANGE_FINISHED);
 				}
 
 			} else {
@@ -289,14 +283,14 @@ public class Control extends Processor implements ControlEventsListener {
 					targetId = serviceId;
 				}
 
-				manager.sendCustom(new CustomEvent(serviceId, targetId, customEventName, null, optionalMsg));
+				manager.sendCustomEvent(serviceId, targetId, customEventName, null, optionalMsg);
 			}
 
 			LOG.info("sending custom event with optional message: {}", optionalMsg);
 
 		} catch (Exception e) {
 			try {
-				manager.sendException(serviceId, e);
+				manager.sendExceptionEvent(serviceId, e);
 			} catch (Exception e1) {
 				LOG.error("{}", e1);
 			}

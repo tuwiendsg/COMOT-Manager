@@ -18,23 +18,17 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.core;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
-import at.ac.tuwien.dsg.comot.m.common.Constants;
-import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -43,11 +37,7 @@ import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
 import at.ac.tuwien.dsg.comot.m.common.event.state.Transition;
-import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
-import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
-import at.ac.tuwien.dsg.comot.model.provider.Resource;
-import at.ac.tuwien.dsg.comot.model.type.OsuType;
 
 @Component
 public class EpsBuilder extends Processor {
@@ -61,21 +51,16 @@ public class EpsBuilder extends Processor {
 	@Autowired
 	protected InformationClient infoService;
 
-	private Set<String> staticEps = new HashSet<>();
-
 	@Override
-	public List<Binding> getBindings(String queueName, String instanceId) {
-		List<Binding> bindings = new ArrayList<>();
+	public Bindings getBindings(String instanceId) {
 
-		bindings.add(bindingLifeCycle(queueName, "*." + Action.CREATED + "." + Type.SERVICE + ".#"));
-		bindings.add(bindingLifeCycle(queueName, "*." + Action.UNDEPLOYED + "." + Type.SERVICE + ".#"));
+		return new Bindings()
+				.addLifecycle("*." + Action.CREATED + "." + Type.SERVICE + ".#")
+				.addLifecycle("*." + Action.UNDEPLOYED + "." + Type.SERVICE + ".#")
 
-		bindings.add(bindingCustom(queueName, "*." + EpsEvent.EPS_DYNAMIC_REQUESTED + "." + Type.SERVICE + ".*"));
-		bindings.add(bindingCustom(queueName, "*." + EpsEvent.EPS_DYNAMIC_REMOVED + "." + Type.SERVICE + ".*"));
-		bindings.add(bindingCustom(queueName, "*." + EpsEvent.EPS_SUPPORT_ASSIGNED + "." + Type.SERVICE + ".*"));
-		bindings.add(bindingCustom(queueName, "*." + EpsEvent.EPS_REFRESHED + ".#"));
-
-		return bindings;
+				.addCustom("*." + EpsEvent.EPS_DYNAMIC_REQUESTED + "." + Type.SERVICE + ".*")
+				.addCustom("*." + EpsEvent.EPS_DYNAMIC_REMOVED + "." + Type.SERVICE + ".*")
+				.addCustom("*." + EpsEvent.EPS_SUPPORT_ASSIGNED + "." + Type.SERVICE + ".*");
 	}
 
 	@Override
@@ -87,12 +72,12 @@ public class EpsBuilder extends Processor {
 			if (action == Action.CREATED) {
 				String staticDeplId = infoService.instanceIdOfStaticEps(env.getProperty("eps.deployment.central"));
 
-				manager.sendCustom(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(),
-						staticDeplId, null));
+				manager.sendCustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(), staticDeplId,
+						null);
 
 			} else if (action == Action.UNDEPLOYED) {
 
-				manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.REMOVED));
+				manager.sendLifeCycleEvent(serviceId, serviceId, Action.REMOVED);
 
 			}
 		}
@@ -108,75 +93,21 @@ public class EpsBuilder extends Processor {
 
 			String newServiceId = infoService.getOsuInstance(optionalMessage).getService().getId();
 
-			manager.sendLifeCycle(new LifeCycleEvent(newServiceId, newServiceId, Action.CREATED));
+			manager.sendLifeCycleEvent(newServiceId, newServiceId, Action.CREATED);
 
 		} else if (action == EpsEvent.EPS_SUPPORT_ASSIGNED && infoService.isServiceOfDynamicEps(serviceId)) {
 
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.START));
+			manager.sendLifeCycleEvent(serviceId, serviceId, Action.START);
 
 		} else if (action == EpsEvent.EPS_DYNAMIC_REMOVED) {
 
-			manager.sendLifeCycle(new LifeCycleEvent(serviceId, serviceId, Action.STOP));
-
-		} else if (action == EpsEvent.EPS_REFRESHED) {
-
-			refresh();
+			manager.sendLifeCycleEvent(serviceId, serviceId, Action.STOP);
 		}
-
 	}
 
 	@Override
 	public void onExceptionEvent(ExceptionMessage msg) throws Exception {
 		// not needed
-	}
-
-	public void refresh() throws EpsException {
-
-		List<OfferedServiceUnit> osus = infoService.getOsus();
-
-		// create static EPSes
-		for (OfferedServiceUnit osu : osus) {
-
-			if (isStaticEps(osu) && !staticEps.contains(osu.getId())) {
-
-				try {
-
-					Class<?> clazz = null;
-					String ip = null;
-					String port = null;
-
-					for (Resource res : osu.getResources()) {
-						switch (res.getType().getName()) {
-						case Constants.ADAPTER_CLASS:
-							clazz = Class.forName(res.getName());
-							break;
-						case Constants.IP:
-							ip = res.getName();
-							break;
-						case Constants.PORT:
-							port = res.getName();
-							break;
-						}
-					}
-
-					String epsId = infoService.createOsuInstance(osu.getId());
-
-					if (clazz != null) {
-						EpsAdapterStatic adapter = (EpsAdapterStatic) context.getBean(clazz);
-						adapter.start(epsId, ip, (port != null) ? Integer.valueOf(port) : null);
-					}
-
-					staticEps.add(osu.getId());
-
-				} catch (Exception e) {
-					LOG.warn("{}", e);
-				}
-			}
-		}
-	}
-
-	public static boolean isStaticEps(OfferedServiceUnit osu) {
-		return osu.getType().equals(OsuType.EPS.toString()) && osu.getServiceTemplate() == null;
 	}
 
 }

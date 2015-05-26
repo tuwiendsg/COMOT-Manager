@@ -18,10 +18,7 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.adapter.general;
 
-import java.util.List;
 import java.util.Map;
-
-import org.springframework.amqp.core.Binding;
 
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
@@ -32,9 +29,9 @@ import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 
 public interface IProcessor {
 
-	void init(IManager dispatcher, String participantId) throws Exception;
+	void init(IManager manager, String participantId);
 
-	List<Binding> getBindings(String queueName, String serviceId);
+	Bindings getBindings(String serviceId);
 
 	void onLifecycleEvent(
 			String serviceId,

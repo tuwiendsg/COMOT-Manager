@@ -50,6 +50,8 @@ public class ProcessorListener implements MessageListener {
 	@Override
 	public void onMessage(Message message) {
 
+		LOG.info(manager.logId() + " >>> " + message.getMessageProperties().getReceivedRoutingKey());
+
 		String serviceId = null;
 		ComotMessage comotMsg;
 		try {
@@ -111,7 +113,7 @@ public class ProcessorListener implements MessageListener {
 
 		} catch (Exception e) {
 			try {
-				manager.sendException(serviceId, e);
+				manager.sendExceptionEvent(serviceId, e);
 			} catch (Exception e1) {
 				LOG.error("{}", e1);
 			}

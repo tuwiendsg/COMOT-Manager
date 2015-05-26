@@ -40,9 +40,6 @@ import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.eps.DeploymentClient;
-import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
-import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
-import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.DeploymentMapper;
@@ -140,9 +137,8 @@ public class DeploymentHelper {
 
 						if (!currentStates.containsKey(inst.getId())) {
 
-							manager.sendLifeCycle(new LifeCycleEvent(serviceId, inst.getId(),
-									Action.UNDEPLOYMENT_STARTED));
-							manager.sendLifeCycle(new LifeCycleEvent(serviceId, inst.getId(), Action.UNDEPLOYED));
+							manager.sendLifeCycleEvent(serviceId, inst.getId(), Action.UNDEPLOYMENT_STARTED);
+							manager.sendLifeCycleEvent(serviceId, inst.getId(), Action.UNDEPLOYED);
 							iterator.remove();
 						}
 					}
@@ -219,12 +215,12 @@ public class DeploymentHelper {
 		// check if also the translated Life-cycle state have changed
 		if (lcStateNew == null || lcStateNew == lcStateOld) {
 
-			manager.sendCustom(new CustomEvent(serviceId, uInstId, stateNew, adapterId, null));
+			manager.sendCustomEvent(serviceId, uInstId, stateNew, null, null);
 
 		} else {
 
 			if (lcStateNew == State.ERROR) {
-				manager.sendLifeCycle(new LifeCycleEvent(serviceId, uInstId, Action.ERROR));
+				manager.sendLifeCycleEvent(serviceId, uInstId, Action.ERROR);
 				return;
 
 			} else {
@@ -242,14 +238,10 @@ public class DeploymentHelper {
 
 				LOG.info("creating ModifyingLifeCycleEvent for: {}, navigator: {}", uInstId, nav);
 
-				manager.sendLifeCycle(new LifeCycleEventModifying(serviceId, uInstId, action, adapterId,
-						System.currentTimeMillis(), nav.getUnitFor(uInstId).getId(), nav.getInstance(uInstId)));
+				manager.sendLifeCycleEvent(serviceId, uInstId, action, nav.getUnitFor(uInstId).getId(),
+						nav.getInstance(uInstId));
 			}
 		}
-	}
-
-	public void setAdapterId(String adapterId) {
-		this.adapterId = adapterId;
 	}
 
 	public void setDeployment(DeploymentClient deployment) {

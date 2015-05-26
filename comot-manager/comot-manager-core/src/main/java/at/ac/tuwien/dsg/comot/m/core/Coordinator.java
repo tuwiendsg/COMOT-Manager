@@ -40,6 +40,8 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Manager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.SingleQueueManager;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
+import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
+import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
@@ -49,12 +51,14 @@ import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ComotMessage;
+import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
+import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
-import at.ac.tuwien.dsg.comot.m.core.lifecycle.LifeCycleManager;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.ToscaMapper;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
 import at.ac.tuwien.dsg.comot.model.provider.OsuInstance;
+import at.ac.tuwien.dsg.comot.model.provider.Resource;
 
 @Component
 public class Coordinator {
@@ -69,8 +73,6 @@ public class Coordinator {
 	@Autowired
 	protected InformationClient infoService;
 	@Autowired
-	protected LifeCycleManager lcManager;
-	@Autowired
 	protected RabbitTemplate amqp;
 
 	@Autowired
@@ -82,7 +84,7 @@ public class Coordinator {
 
 		String serviceId = infoService.createService(service);
 		LOG.info("serviceId {}", serviceId);
-		sendLifeCycleWaitForId(new LifeCycleEventModifying(serviceId, serviceId, Action.CREATED, null, service));
+		sendAndWaitForId(new LifeCycleEventModifying(serviceId, serviceId, Action.CREATED, null, service));
 
 		return serviceId;
 
@@ -93,42 +95,69 @@ public class Coordinator {
 		String serviceId = infoService.createServiceFromTemplate(templateId);
 		CloudService service = infoService.getService(serviceId);
 
-		sendLifeCycleWaitForId(new LifeCycleEventModifying(serviceId, serviceId, Action.CREATED, null, service));
+		sendAndWaitForId(new LifeCycleEventModifying(serviceId, serviceId, Action.CREATED, null, service));
 
 		return serviceId;
 	}
 
 	public void startService(String serviceId) throws Exception {
 
-		sendLifeCycleWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.START));
+		sendAndWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.START));
 	}
 
 	public void stopService(String serviceId) throws Exception {
 
-		sendLifeCycleWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.STOP));
+		sendAndWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.STOP));
 	}
 
 	public void removeService(String serviceId) throws Exception {
 
-		sendLifeCycleWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.REMOVED));
+		sendAndWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.REMOVED));
 	}
 
 	public void reconfigureElasticity(String serviceId, CloudService service) throws Exception {
 
-		sendLifeCycleWaitForId(new LifeCycleEventModifying(serviceId, serviceId,
+		sendAndWaitForId(new LifeCycleEventModifying(serviceId, serviceId,
 				Action.RECONFIGURE_ELASTICITY, null, service));
 	}
 
 	public void kill(String serviceId) throws Exception {
 
-		sendLifeCycleWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.TERMINATE));
+		sendAndWaitForId(new LifeCycleEvent(serviceId, serviceId, Action.TERMINATE));
 	}
 
-	public String addEps(OfferedServiceUnit osu) throws JAXBException, EpsException {
+	public String addStaticEps(OfferedServiceUnit osu) throws NumberFormatException, Exception {
+
+		if (!InfoServiceUtils.isStaticEps(osu)) {
+			throw new ComotIllegalArgumentException("The OfferedServiceUnit is not a valid external EPS");
+		}
 
 		String epsId = infoService.addOsu(osu);
 
-		sendCustom(new CustomEvent(null, null, EpsEvent.EPS_REFRESHED.toString(), null, null));
+		Class<?> clazz = null;
+		String ip = null;
+		String port = null;
+
+		for (Resource res : osu.getResources()) {
+			switch (res.getType().getName()) {
+			case Constants.ADAPTER_CLASS:
+				clazz = Class.forName(res.getName());
+				break;
+			case Constants.IP:
+				ip = res.getName();
+				break;
+			case Constants.PORT:
+				port = res.getName();
+				break;
+			}
+		}
+
+		String epsInstanceId = infoService.createOsuInstance(osu.getId());
+
+		if (clazz != null) {
+			EpsAdapterStatic adapter = (EpsAdapterStatic) context.getBean(clazz);
+			adapter.start(epsInstanceId, ip, (port != null) ? Integer.valueOf(port) : null);
+		}
 
 		return epsId;
 	}
@@ -185,7 +214,8 @@ public class Coordinator {
 
 	}
 
-	protected void sendLifeCycleWaitForId(final LifeCycleEvent event) throws Exception {
+	protected void sendAndWaitForId(final AbstractEvent event) throws InterruptedException, JAXBException,
+			ComotException {
 
 		final String evantId = event.getEventId();
 
@@ -200,7 +230,12 @@ public class Coordinator {
 
 			@Override
 			public void sendInternal() throws JAXBException {
-				coordinator.sendLifeCycle(event);
+				if (event instanceof LifeCycleEvent) {
+					coordinator.sendLifeCycle((LifeCycleEvent) event);
+				} else {
+					coordinator.sendCustom((CustomEvent) event);
+				}
+
 			}
 		};
 

@@ -19,8 +19,6 @@
 package at.ac.tuwien.dsg.comot.m.ui;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,12 +26,12 @@ import org.glassfish.jersey.media.sse.EventOutput;
 import org.glassfish.jersey.media.sse.OutboundEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
@@ -62,15 +60,11 @@ public class UiAdapterImpl extends Processor implements UiAdapter {
 	public static final String MSG_CUSTOM_EVENT = "MSG_CUSTOM_EVENT";
 
 	@Override
-	public List<Binding> getBindings(String queueName, String instanceId) {
-
-		List<Binding> bindings = new ArrayList<>();
-
-		bindings.add(bindingLifeCycle(queueName, csInstanceId + ".#"));
-		bindings.add(bindingCustom(queueName, csInstanceId + ".#"));
-		bindings.add(bindingException(queueName, csInstanceId + ".#"));
-
-		return bindings;
+	public Bindings getBindings(String instanceId) {
+		return new Bindings()
+				.addLifecycle(csInstanceId + ".#")
+				.addCustom(csInstanceId + ".#")
+				.addException(csInstanceId + ".#");
 	}
 
 	public void setUiAdapter(String csInstanceId, EventOutput eventOutput) {

@@ -164,9 +164,9 @@ public class AppContextCoreInsertData {
 		control.hasPrimitiveOperation(
 				new ComotCustomEvent("Stop controller", ComotEvent.RSYBL_STOP.toString(), false));
 		try {
-			coordinator.addEps(deployment);
-			coordinator.addEps(monitoring);
-			coordinator.addEps(control);
+			coordinator.addStaticEps(deployment);
+			coordinator.addStaticEps(monitoring);
+			coordinator.addStaticEps(control);
 		} catch (Exception e) {
 			LOG.error("{}", e);
 		}
@@ -191,7 +191,7 @@ public class AppContextCoreInsertData {
 
 			monitoringDynamic.setServiceTemplate(new Template(melaService.getId(), melaService));
 
-			coordinator.addEps(monitoringDynamic);
+			infoService.addOsu(monitoringDynamic);
 
 		} catch (Exception e) {
 			LOG.error("{}", e);
@@ -218,7 +218,7 @@ public class AppContextCoreInsertData {
 
 			rsyblDynamic.setServiceTemplate(new Template(rsyblService.getId(), rsyblService));
 
-			coordinator.addEps(rsyblDynamic);
+			infoService.addOsu(rsyblDynamic);
 
 		} catch (Exception e) {
 			LOG.error("{}", e);
@@ -235,7 +235,7 @@ public class AppContextCoreInsertData {
 
 			salsaDynamic.setServiceTemplate(new Template(salsaService.getId(), salsaService));
 
-			coordinator.addEps(salsaDynamic);
+			infoService.addOsu(salsaDynamic);
 
 		} catch (Exception e) {
 			LOG.error("{}", e);

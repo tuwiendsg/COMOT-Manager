@@ -20,16 +20,24 @@ package at.ac.tuwien.dsg.comot.m.adapter.general;
 
 import javax.xml.bind.JAXBException;
 
-import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
-import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
+import at.ac.tuwien.dsg.comot.m.common.enums.Action;
+import at.ac.tuwien.dsg.comot.model.devel.structure.ServiceEntity;
+import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
 
 public interface IManager {
 
-	void sendLifeCycle(LifeCycleEvent event) throws JAXBException;
+	void sendLifeCycleEvent(String serviceId, String groupId, Action action) throws JAXBException;
 
-	void sendCustom(CustomEvent event) throws JAXBException;
+	void sendLifeCycleEvent(String serviceId, String groupId, Action action, String parentId, ServiceEntity entity)
+			throws JAXBException;
 
-	void sendException(String instanceId, Exception e) throws JAXBException;
+	void sendLifeCycleEvent(String serviceId, String groupId, Action action, String parentId, UnitInstance instance)
+			throws JAXBException;
+
+	void sendCustomEvent(String serviceId, String groupId, String eventName, String epsId, String message)
+			throws JAXBException;
+
+	void sendExceptionEvent(String instanceId, Exception e) throws JAXBException;
 
 	void stop();
 

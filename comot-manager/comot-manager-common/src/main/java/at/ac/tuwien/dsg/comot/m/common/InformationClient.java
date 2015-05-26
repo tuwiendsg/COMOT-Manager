@@ -34,7 +34,6 @@ import at.ac.tuwien.dsg.comot.model.devel.structure.Template;
 import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
 import at.ac.tuwien.dsg.comot.model.provider.OsuInstance;
 import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
-import at.ac.tuwien.dsg.comot.model.type.OsuType;
 
 public class InformationClient {
 
@@ -264,7 +263,7 @@ public class InformationClient {
 		} else if (EXTERNAL.equals(type)) {
 			for (Iterator<OsuInstance> iterator = allEpsInstances.iterator(); iterator.hasNext();) {
 				OsuInstance osu = iterator.next();
-				if (InformationClient.isDynamicEps(osu.getOsu())) {
+				if (InfoServiceUtils.isDynamicEps(osu.getOsu())) {
 					iterator.remove();
 				}
 			}
@@ -272,7 +271,7 @@ public class InformationClient {
 		} else if (USER_MANAGED.equals(type)) {
 			for (Iterator<OsuInstance> iterator = allEpsInstances.iterator(); iterator.hasNext();) {
 				OsuInstance osu = iterator.next();
-				if (!InformationClient.isDynamicEps(osu.getOsu())) {
+				if (!InfoServiceUtils.isDynamicEps(osu.getOsu())) {
 					iterator.remove();
 				}
 			}
@@ -304,17 +303,7 @@ public class InformationClient {
 			return false;
 		}
 
-		return isDynamicEps(osuInstance.getOsu());
-	}
-
-	public static boolean isDynamicEps(OfferedServiceUnit osu) throws EpsException {
-
-		if (osu != null && osu.getType().equals(OsuType.EPS.toString()) && osu.getServiceTemplate() != null) {
-			return true;
-		} else {
-			return false;
-		}
-
+		return InfoServiceUtils.isDynamicEps(osuInstance.getOsu());
 	}
 
 }

@@ -18,20 +18,6 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.adapter.general;
 
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.Binding.DestinationType;
-
-import at.ac.tuwien.dsg.comot.m.common.Constants;
-import at.ac.tuwien.dsg.comot.m.common.enums.Action;
-import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
-import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
-import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
-import at.ac.tuwien.dsg.comot.m.common.event.state.Transition;
-import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
-
 public abstract class Processor implements IProcessor {
 
 	protected IManager manager;
@@ -43,50 +29,6 @@ public abstract class Processor implements IProcessor {
 		this.participantId = participantId;
 
 	}
-
-	public IManager getManager() {
-		return manager;
-	}
-
-	public static Binding bindingLifeCycle(String queueName, String key) {
-		return new Binding(queueName, DestinationType.QUEUE, Constants.EXCHANGE_LIFE_CYCLE,
-				key, null);
-	}
-
-	public static Binding bindingCustom(String queueName, String key) {
-		return new Binding(queueName, DestinationType.QUEUE, Constants.EXCHANGE_CUSTOM_EVENT,
-				key, null);
-	}
-
-	public static Binding bindingException(String queueName, String key) {
-		return new Binding(queueName, DestinationType.QUEUE, Constants.EXCHANGE_EXCEPTIONS,
-				key, null);
-	}
-
-	@Override
-	public abstract List<Binding> getBindings(String queueName, String instanceId);
-
-	@Override
-	public abstract void onLifecycleEvent(
-			String serviceId,
-			String groupId,
-			Action action,
-			CloudService service,
-			Map<String, Transition> transitions,
-			LifeCycleEvent event) throws Exception;
-
-	@Override
-	public abstract void onCustomEvent(
-			String serviceId,
-			String groupId,
-			String eventName,
-			String epsId,
-			String optionalMessage,
-			Map<String, Transition> transitions,
-			CustomEvent event) throws Exception;
-
-	@Override
-	public abstract void onExceptionEvent(ExceptionMessage msg) throws Exception;
 
 	public String logId() {
 		return manager.logId();

@@ -18,7 +18,11 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.common;
 
-public class InfoServiceConstants {
+import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
+import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
+import at.ac.tuwien.dsg.comot.model.type.OsuType;
+
+public class InfoServiceUtils {
 
 	public static final String TEMPLATES = "templates";
 	public static final String TEMPLATES_ONE = "templates/{templateId}";
@@ -37,5 +41,19 @@ public class InfoServiceConstants {
 	public static final String EPS_INSTANCE_ONE = "epsesInstances/{epsInstanceId}";
 
 	public static final String DELETE_ALL = "all";
+
+	public static boolean isStaticEps(OfferedServiceUnit osu) {
+
+		return isEps(osu) && osu.getServiceTemplate() == null;
+	}
+
+	public static boolean isDynamicEps(OfferedServiceUnit osu) throws EpsException {
+
+		return isEps(osu) && osu.getServiceTemplate() != null;
+	}
+
+	public static boolean isEps(OfferedServiceUnit osu) {
+		return osu != null && osu.getType().equals(OsuType.EPS.toString());
+	}
 
 }

@@ -18,18 +18,16 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.core;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.Binding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.UtilsLc;
+import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
@@ -70,14 +68,12 @@ public class Recording extends Processor {
 	protected RevisionApi revisionApi;
 
 	@Override
-	public List<Binding> getBindings(String queueName, String instanceId) {
-		List<Binding> bindings = new ArrayList<>();
+	public Bindings getBindings(String notUsed) {
 
-		bindings.add(bindingLifeCycle(queueName, "#"));
-		bindings.add(bindingCustom(queueName, "#"));
-		bindings.add(bindingException(queueName, "#"));
-
-		return bindings;
+		return new Bindings()
+				.addLifecycle("#")
+				.addCustom("#")
+				.addException("#");
 	}
 
 	@Override
