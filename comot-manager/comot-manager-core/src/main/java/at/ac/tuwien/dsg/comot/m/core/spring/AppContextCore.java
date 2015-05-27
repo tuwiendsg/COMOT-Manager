@@ -41,7 +41,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InformationClientRest;
 import at.ac.tuwien.dsg.comot.m.common.eps.ControlClient;
 import at.ac.tuwien.dsg.comot.m.common.eps.DeploymentClient;
@@ -97,8 +97,8 @@ public class AppContextCore {
 
 	// clients
 	@Bean
-	public InformationClient informationClient() throws URISyntaxException {
-		return new InformationClient(new InformationClientRest(new URI(env.getProperty("uri.information"))));
+	public InfoClient informationClient() throws URISyntaxException {
+		return new InfoClient(new InformationClientRest(new URI(env.getProperty("uri.information"))));
 	}
 
 	@Bean

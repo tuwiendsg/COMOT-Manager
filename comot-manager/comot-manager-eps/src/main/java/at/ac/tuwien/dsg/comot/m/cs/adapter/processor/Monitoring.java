@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
@@ -48,7 +48,7 @@ public class Monitoring extends Processor {
 	@Autowired
 	protected MonitoringClient monitoring;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	public void setHostAndPort(String host, int port) {
 		monitoring.setHostAndPort(host, port);

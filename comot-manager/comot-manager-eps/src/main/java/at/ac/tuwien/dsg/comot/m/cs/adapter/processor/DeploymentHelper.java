@@ -18,12 +18,10 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Future;
 
 import javax.xml.bind.JAXBException;
 
@@ -36,12 +34,11 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.UtilsLc;
 import at.ac.tuwien.dsg.comot.m.adapter.general.IManager;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.eps.DeploymentClient;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
-import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.DeploymentMapper;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
@@ -53,7 +50,8 @@ public class DeploymentHelper {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DeploymentHelper.class);
 
-	public static long REFRESH_INTERVAL = 1000;
+	public static long WAIT_SHORT = 1000;
+	public static long WAIT_LONG = 30000;
 
 	protected DeploymentClient deployment;
 	protected Deployment dAdapt;
@@ -62,61 +60,20 @@ public class DeploymentHelper {
 	@Autowired
 	protected DeploymentMapper mapper;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	protected String adapterId;
 
 	@Async
-	public void monitorStatusUntilDeployed(String serviceId, CloudService service)
-			throws EpsException,
-			ComotException, IOException, JAXBException, InterruptedException, ClassNotFoundException {
+	public void monitoringStatus(String serviceId, CloudService service, Deployment.Signal signal) {
+
+		LOG.info("monitoringStatus(serviceId={})", serviceId);
 
 		try {
 
 			Map<String, String> currentStates = new HashMap<>();
 			Memory memory = new Memory();
-			boolean notAllRunning = false;
-
-			UtilsLc.removeProviderInfo(service);
-
-			do {
-				try {
-
-					notAllRunning = false;
-					memory.refresh(currentStates);
-					currentStates = oneInteration(memory, serviceId, service);
-
-					if (currentStates.isEmpty()) {
-						notAllRunning = true;
-					}
-
-					for (String state : currentStates.values()) {
-						if (DeploymentMapper.convert(state) != State.RUNNING) {
-							notAllRunning = true;
-						}
-					}
-
-				} catch (ComotException e) {
-					LOG.warn("{}", e);
-				}
-
-			} while (notAllRunning);
-			LOG.info("stopped checking");
-		} catch (Exception e) {
-			LOG.error("{}", e);
-		}
-
-	}
-
-	@Async
-	public Future<Object> monitoringStatusUntilInterupted(String serviceId, CloudService service) {
-
-		LOG.info("monitoringStatusUntilInterupted(instanceId={})", serviceId);
-
-		try {
-
-			Map<String, String> currentStates = new HashMap<>();
-			Memory memory = new Memory();
+			// boolean notAllRunning;
 
 			UtilsLc.removeProviderInfo(service);
 
@@ -129,9 +86,22 @@ public class DeploymentHelper {
 			do {
 				try {
 
+					synchronized (signal.monitor) {
+						if (signal.highIntensity) {
+							signal.monitor.wait(WAIT_SHORT);
+						} else {
+							signal.monitor.wait(WAIT_LONG);
+						}
+					}
+
+					if (signal.stop) {
+						break;
+					}
+
 					memory.refresh(currentStates);
 					currentStates = oneInteration(memory, serviceId, service);
 
+					// detect removed instances
 					for (Iterator<UnitInstance> iterator = oldInstances.iterator(); iterator.hasNext();) {
 						UnitInstance inst = iterator.next();
 
@@ -144,18 +114,24 @@ public class DeploymentHelper {
 					}
 
 				} catch (ComotException e) {
-					// TODO send exception to recorder
+					dAdapt.getManager().sendExceptionEvent(serviceId, e);
 					LOG.warn("{}", e);
 				}
+
 			} while (true);
+
+			LOG.info(dAdapt.logId() + "Stopped checking state for '{}'", serviceId);
+
 		} catch (InterruptedException e) {
 			LOG.info("Task interrupted as expected");
 		} catch (Exception e) {
-			// TODO send exception to recorder
+			try {
+				dAdapt.getManager().sendExceptionEvent(serviceId, e);
+			} catch (JAXBException e1) {
+				LOG.error("{}", e1);
+			}
 			LOG.error("{}", e);
 		}
-		return null;
-
 	}
 
 	protected Map<String, String> oneInteration(Memory memory, String serviceId, CloudService service)
@@ -167,8 +143,6 @@ public class DeploymentHelper {
 		String stateNew;
 
 		currentStates = new HashMap<>();
-
-		Thread.sleep(REFRESH_INTERVAL);
 
 		serviceReturned = deployment.refreshStatus(currentStates, service);
 		serviceReturned.setId(serviceId);

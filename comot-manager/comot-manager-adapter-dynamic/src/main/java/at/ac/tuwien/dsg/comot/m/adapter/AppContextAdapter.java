@@ -41,7 +41,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InformationClientRest;
 import at.ac.tuwien.dsg.comot.m.common.eps.ControlClient;
 import at.ac.tuwien.dsg.comot.m.common.eps.DeploymentClient;
@@ -105,7 +105,7 @@ public class AppContextAdapter {
 	// clients
 
 	@Bean
-	public InformationClient informationClient() throws URISyntaxException {
+	public InfoClient informationClient() throws URISyntaxException {
 
 		URI uri = new URI(env.getProperty("uri.information"));
 
@@ -114,7 +114,7 @@ public class AppContextAdapter {
 		}
 		LOG.info("setting connection to information service: {}", uri);
 
-		return new InformationClient(new InformationClientRest(uri));
+		return new InfoClient(new InformationClientRest(uri));
 	}
 
 	@Bean

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.IManager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.IProcessor;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
@@ -22,7 +22,7 @@ import at.ac.tuwien.dsg.comot.model.type.State;
 public class SampleProcessor implements IProcessor {
 
 	@Autowired
-	protected InformationClient infoService; // may access information service
+	protected InfoClient infoService; // may access information service
 
 	protected IManager manager;
 	protected String participantId;

@@ -18,7 +18,7 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.common;
 
-public interface EpsAdapterStatic {
+public interface EpsAdapterExternal {
 
 	void start(String participantId, String host, Integer port) throws Exception;
 }

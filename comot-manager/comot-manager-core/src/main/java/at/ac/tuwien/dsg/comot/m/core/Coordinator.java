@@ -40,9 +40,9 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Manager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.SingleQueueManager;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
-import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
+import at.ac.tuwien.dsg.comot.m.common.EpsAdapterExternal;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -51,7 +51,6 @@ import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ComotMessage;
-import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.ToscaMapper;
@@ -71,7 +70,7 @@ public class Coordinator {
 	@Autowired
 	protected ApplicationContext context;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 	@Autowired
 	protected RabbitTemplate amqp;
 
@@ -155,7 +154,7 @@ public class Coordinator {
 		String epsInstanceId = infoService.createOsuInstance(osu.getId());
 
 		if (clazz != null) {
-			EpsAdapterStatic adapter = (EpsAdapterStatic) context.getBean(clazz);
+			EpsAdapterExternal adapter = (EpsAdapterExternal) context.getBean(clazz);
 			adapter.start(epsInstanceId, ip, (port != null) ? Integer.valueOf(port) : null);
 		}
 
@@ -214,8 +213,7 @@ public class Coordinator {
 
 	}
 
-	protected void sendAndWaitForId(final AbstractEvent event) throws InterruptedException, JAXBException,
-			ComotException {
+	protected void sendAndWaitForId(final AbstractEvent event) throws Exception {
 
 		final String evantId = event.getEventId();
 

@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
@@ -51,7 +51,7 @@ public class UiAdapterImpl extends Processor implements UiAdapter {
 	private static final Logger LOG = LoggerFactory.getLogger(UiAdapterImpl.class);
 
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	protected String csInstanceId;
 	protected EventOutput eventOutput;

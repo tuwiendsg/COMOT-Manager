@@ -35,23 +35,24 @@ import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
 import at.ac.tuwien.dsg.comot.model.provider.OsuInstance;
 import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
 
-public class InformationClient {
+public class InfoClient {
 
-	private static final Logger LOG = LoggerFactory.getLogger(InformationClient.class);
+	private static final Logger LOG = LoggerFactory.getLogger(InfoClient.class);
 
 	public static final String NON_EPS = "NON_EPS";
 	public static final String EPS = "EPS";
 	public static final String ALL = "ALL";
 	public static final String EXTERNAL = "EXTERNAL";
 	public static final String USER_MANAGED = "USER_MANAGED";
+	public static final String ACTIVE = "ACTIVE";
 
 	protected InformationClientRest client;
 
-	public InformationClient() {
+	public InfoClient() {
 
 	}
 
-	public InformationClient(InformationClientRest client) {
+	public InfoClient(InformationClientRest client) {
 		super();
 		this.client = client;
 	}

@@ -50,7 +50,7 @@ public class ProcessorListener implements MessageListener {
 	@Override
 	public void onMessage(Message message) {
 
-		LOG.info(manager.logId() + " >>> " + message.getMessageProperties().getReceivedRoutingKey());
+		// LOG.info(manager.logId() + " >>> " + message.getMessageProperties().getReceivedRoutingKey());
 
 		String serviceId = null;
 		ComotMessage comotMsg;

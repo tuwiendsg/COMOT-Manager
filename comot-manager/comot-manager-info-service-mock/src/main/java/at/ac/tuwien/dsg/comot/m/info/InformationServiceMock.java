@@ -139,11 +139,6 @@ public class InformationServiceMock {
 	}
 
 	public void removeService(String serviceId) {
-
-		if (!services.containsKey(serviceId)) {
-			throw new ComotIllegalArgumentException("There is no service '" + serviceId + "'");
-		}
-
 		services.remove(serviceId);
 	}
 

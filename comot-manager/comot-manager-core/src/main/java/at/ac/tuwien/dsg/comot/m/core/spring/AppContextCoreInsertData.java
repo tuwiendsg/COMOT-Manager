@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
 import at.ac.tuwien.dsg.comot.m.common.Constants;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotAdapterException;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
@@ -72,7 +72,7 @@ public class AppContextCoreInsertData {
 	@Autowired
 	protected ToscaMapper mapperTosca;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 	@Autowired
 	protected RabbitTemplate amqp;
 	@Autowired

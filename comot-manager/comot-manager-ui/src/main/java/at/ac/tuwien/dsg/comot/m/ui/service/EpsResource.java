@@ -18,9 +18,7 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.ui.service;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,24 +36,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
-import org.apache.commons.io.FileUtils;
-import org.glassfish.jersey.media.multipart.ContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
 import at.ac.tuwien.dsg.comot.m.common.MngPath;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.core.Coordinator;
+import at.ac.tuwien.dsg.comot.m.core.lifecycle.LifeCycleManager;
 import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
 import at.ac.tuwien.dsg.comot.model.provider.OsuInstance;
+import at.ac.tuwien.dsg.comot.model.type.State;
 
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -74,7 +70,9 @@ public class EpsResource {
 	@Autowired
 	protected Coordinator coordinator;
 	@Autowired
-	protected InformationClient infoServ;
+	protected InfoClient infoServ;
+	@Autowired
+	protected LifeCycleManager lcManager;
 
 	@javax.annotation.Resource
 	public Environment env;
@@ -82,7 +80,7 @@ public class EpsResource {
 	private static final String UPLOADS_DIR = "uploads/";
 
 	@POST
-	@Path(MngPath.EPS_EXTERNAL)
+	@Path(MngPath.INIT_EPS_EXTERNAL)
 	@Produces(MediaType.TEXT_PLAIN)
 	@ApiOperation(
 			value = "Add new external EPS. Returns the participantId/epsInstanceId.",
@@ -95,30 +93,48 @@ public class EpsResource {
 		return Response.ok(epsInstanceId).build();
 	}
 
+	// @POST
+	// @Path("/{epsId}/instances")
+	// @Consumes(MediaType.MULTIPART_FORM_DATA)
+	// @Produces(MediaType.TEXT_PLAIN)
+	// @ApiOperation(
+	// value = "Create a new instance of the user-managed EPS",
+	// response = String.class)
+	// public Response createDynamicEpsInstance(
+	// @ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId,
+	// @ApiParam(value = "Configuration file", required = false) FormDataMultiPart form)
+	// throws ComotException, ClassNotFoundException, IOException, JAXBException {
+	//
+	// // get file
+	// FormDataBodyPart filePart = form.getField("file");
+	// ContentDisposition headerOfFilePart = filePart.getContentDisposition();
+	// InputStream fileInputStream = filePart.getValueAs(InputStream.class);
+	// String filePath = UPLOADS_DIR + headerOfFilePart.getFileName();
+	//
+	// // save file
+	// File newFile = new File(filePath);
+	// newFile.getParentFile().mkdirs();
+	// FileUtils.copyInputStreamToFile(fileInputStream, newFile);
+	//
+	// String serviceInstanceId = "aaa " + filePath;
+
+	// LOG.info(serviceInstanceId);
+	//
+	// return Response.ok(serviceInstanceId).build();
+	// }
+
 	@POST
 	@Path("/{epsId}/instances")
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Consumes(MediaType.WILDCARD)
 	@Produces(MediaType.TEXT_PLAIN)
 	@ApiOperation(
 			value = "Create a new instance of the user-managed EPS",
 			response = String.class)
 	public Response createDynamicEpsInstance(
-			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId,
-			@ApiParam(value = "Configuration file", required = false) FormDataMultiPart form)
+			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId)
 			throws ComotException, ClassNotFoundException, IOException, JAXBException {
 
-		// get file
-		FormDataBodyPart filePart = form.getField("file");
-		ContentDisposition headerOfFilePart = filePart.getContentDisposition();
-		InputStream fileInputStream = filePart.getValueAs(InputStream.class);
-		String filePath = UPLOADS_DIR + headerOfFilePart.getFileName();
-
-		// save file
-		File newFile = new File(filePath);
-		newFile.getParentFile().mkdirs();
-		FileUtils.copyInputStreamToFile(fileInputStream, newFile);
-
-		String serviceInstanceId = "aaa " + filePath;// coordinator.createDynamicService(epsId);
+		String serviceInstanceId = coordinator.createDynamicService(epsId);
 
 		LOG.info(serviceInstanceId);
 
@@ -145,15 +161,15 @@ public class EpsResource {
 			response = OfferedServiceUnit.class,
 			responseContainer = "List")
 	public Response getElasticPlatformServices(
-			@ApiParam(value = "Type of EPSs to filter", required = false, allowableValues = InformationClient.ALL
-					+ ", " + InformationClient.EXTERNAL + ", " + InformationClient.USER_MANAGED) @DefaultValue(InformationClient.ALL) @QueryParam("type") String type)
+			@ApiParam(value = "Type of EPSs to filter", required = false, allowableValues = InfoClient.ALL
+					+ ", " + InfoClient.EXTERNAL + ", " + InfoClient.USER_MANAGED) @DefaultValue(InfoClient.ALL) @QueryParam("type") String type)
 			throws EpsException {
 
 		List<OfferedServiceUnit> allEps = new ArrayList<>(infoServ.getOsus());
 
-		if (InformationClient.ALL.equals(type)) {
+		if (InfoClient.ALL.equals(type)) {
 
-		} else if (InformationClient.EXTERNAL.equals(type)) {
+		} else if (InfoClient.EXTERNAL.equals(type)) {
 			for (Iterator<OfferedServiceUnit> iterator = allEps.iterator(); iterator.hasNext();) {
 				OfferedServiceUnit osu = iterator.next();
 				if (InfoServiceUtils.isDynamicEps(osu)) {
@@ -161,7 +177,7 @@ public class EpsResource {
 				}
 			}
 
-		} else if (InformationClient.USER_MANAGED.equals(type)) {
+		} else if (InfoClient.USER_MANAGED.equals(type)) {
 			for (Iterator<OfferedServiceUnit> iterator = allEps.iterator(); iterator.hasNext();) {
 				OfferedServiceUnit osu = iterator.next();
 				if (!InfoServiceUtils.isDynamicEps(osu)) {
@@ -198,14 +214,31 @@ public class EpsResource {
 			value = "Get EPS instances",
 			response = OsuInstance.class,
 			responseContainer = "List")
-	public Response getElasticPlatformServicesInstances(
-			@ApiParam(value = "Type of EPS instances to filter", required = false, allowableValues = InformationClient.ALL
-					+ ", " + InformationClient.EXTERNAL + ", " + InformationClient.USER_MANAGED) @DefaultValue(InformationClient.ALL) @QueryParam("type") String type)
+	public Response getEpsInstances(
+			@ApiParam(value = "Type of EPS instances to filter", required = false, allowableValues = InfoClient.ALL
+					+ ", " + InfoClient.EXTERNAL + ", " + InfoClient.USER_MANAGED + ", " + InfoClient.ACTIVE) @DefaultValue(InfoClient.ALL) @QueryParam("type") String type)
 			throws EpsException {
 
-		List<OsuInstance> allEpsInstances = infoServ.getEpsInstances(type);
+		List<OsuInstance> allEpsInstances;
+		State state;
+		if (InfoClient.ACTIVE.equals(type)) {
+
+			allEpsInstances = infoServ.getEpsInstances(InfoClient.EXTERNAL);
+
+			for (OsuInstance oneInstance : infoServ.getEpsInstances(InfoClient.USER_MANAGED)) {
+				state = lcManager.getCurrentStateService(oneInstance.getService().getId());
+
+				LOG.info("state {}", state);
+
+				if (State.RUNNING.equals(state)) {
+					allEpsInstances.add(oneInstance);
+				}
+			}
+
+		} else {
+			allEpsInstances = infoServ.getEpsInstances(type);
+		}
 
 		return Response.ok(allEpsInstances.toArray(new OsuInstance[allEpsInstances.size()])).build();
 	}
-
 }

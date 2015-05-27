@@ -22,21 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
-import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.adapter.general.EpsAdapterManager;
+import at.ac.tuwien.dsg.comot.m.common.EpsAdapterExternal;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Monitoring;
 
 @Component
 @Scope("prototype")
-public class MonitoringAdapterStatic implements EpsAdapterStatic {
+public class MonitoringAdapterStatic implements EpsAdapterExternal {
 
 	@Autowired
 	protected Monitoring processor;
 	@Autowired
-	protected PerInstanceQueueManager manager;
+	protected EpsAdapterManager manager;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	@Override
 	public void start(String participantId, String host, Integer port) throws Exception {

@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Future;
 
 import javax.xml.bind.JAXBException;
 
@@ -38,7 +36,7 @@ import org.springframework.stereotype.Component;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.IManager;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -66,11 +64,11 @@ public class Deployment extends Processor {
 	@Autowired
 	protected DeploymentClient deployment;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 	@Autowired
 	protected DeploymentHelper helper;
 
-	protected Map<String, StatusTask> tasks = Collections.synchronizedMap(new HashMap<String, StatusTask>());
+	protected Map<String, Signal> tasks = Collections.synchronizedMap(new HashMap<String, Signal>());
 
 	@Override
 	public void init(IManager dispatcher, String participantId) {
@@ -98,8 +96,10 @@ public class Deployment extends Processor {
 				.addLifecycle(
 						sId + "." + Action.UNDEPLOYMENT_STARTED + "." + Type.SERVICE + ".TRUE.*.*." + getId() + ".#")
 				.addLifecycle(sId + "." + Action.ELASTIC_CHANGE_STARTED + ".#")
-				.addLifecycle(sId + "." + Action.ELASTIC_CHANGE_FINISHED + ".#")
+				// .addLifecycle(sId + "." + Action.ELASTIC_CHANGE_FINISHED + ".#")
+				.addLifecycle(sId + ".*.*.TRUE." + State.ELASTIC_CHANGE + "." + State.RUNNING + ".#")
 				.addLifecycle(sId + "." + Action.TERMINATE + ".#")
+				.addLifecycle(sId + ".*.*.TRUE." + State.DEPLOYING + "." + State.RUNNING + ".#")
 
 				.addCustom(sId + "." + EpsEvent.EPS_SUPPORT_REMOVED + "." + Type.SERVICE + "." + getId())
 				.addCustom(sId + "." + EpsEvent.EPS_SUPPORT_ASSIGNED + "." + Type.SERVICE + "." + getId());
@@ -118,36 +118,31 @@ public class Deployment extends Processor {
 			manager.sendLifeCycleEvent(serviceId, groupId, Action.UNDEPLOYMENT_STARTED);
 
 		} else if (action == Action.DEPLOYMENT_STARTED) {
-			deployInstance(serviceId);
+			deployService(serviceId);
+
+		} else if (action == Action.DEPLOYED) {
+
+			// stop intensive monitoring
+			LOG.info(logId() + "stop intensive monitoring");
+			tasks.get(serviceId).highIntensity = false;
 
 		} else if (action == Action.UNDEPLOYMENT_STARTED) {
 
-			unDeployInstance(serviceId);
+			undeployService(serviceId);
 
 		} else if (action == Action.ELASTIC_CHANGE_STARTED) {
 
-			if (!tasks.containsKey(serviceId)) {
-				StatusTask task = new StatusTask(serviceId, groupId, helper.monitoringStatusUntilInterupted(
-						serviceId, service));
-				tasks.put(serviceId, task);
+			LOG.info(logId() + "start intensive monitoring");
+			tasks.get(serviceId).highIntensity = true;
+			synchronized (tasks.get(serviceId).monitor) {
+				tasks.get(serviceId).monitor.notify();
 			}
 
 		} else if (action == Action.ELASTIC_CHANGE_FINISHED) {
 
-			boolean stop = true;
-
-			for (Transition transition : transitions.values()) {
-				if (transition.getCurrentState() == State.ELASTIC_CHANGE) {
-					stop = false;
-				}
-			}
-
-			LOG.info("stop {}", stop);
-
-			if (stop) {
-				tasks.get(serviceId).getThread().cancel(true);
-				tasks.remove(serviceId);
-			}
+			// if (stop) {
+			LOG.info(logId() + "stop intensive monitoring");
+			tasks.get(serviceId).highIntensity = false;
 
 		} else if (action == Action.TERMINATE && deployment.isManaged(serviceId)) {
 
@@ -166,7 +161,7 @@ public class Deployment extends Processor {
 
 			manager.sendLifeCycleEvent(serviceId, serviceId, Action.UNDEPLOYMENT_STARTED);
 
-			unDeployInstance(serviceId);
+			undeployService(serviceId);
 
 		}
 	}
@@ -176,25 +171,31 @@ public class Deployment extends Processor {
 		// not needed
 	}
 
-	protected void deployInstance(String serviceId) throws ClassNotFoundException, IOException,
+	protected void deployService(String serviceId) throws ClassNotFoundException, IOException,
 			EpsException, ComotException, JAXBException, InterruptedException {
-
-		// managedSet.add(instanceId);
 
 		CloudService fullService = infoService.getService(serviceId);
 
 		deployment.deploy(fullService);
 
-		helper.monitorStatusUntilDeployed(serviceId, fullService);
+		LOG.info(logId() + "start monitoring");
+		Signal signal = new Signal();
+		tasks.put(serviceId, signal);
+
+		helper.monitoringStatus(serviceId, fullService, signal);
 
 	}
 
-	protected void unDeployInstance(String serviceId)
+	protected void undeployService(String serviceId)
 			throws EpsException, ClassNotFoundException, IOException, JAXBException {
 
-		// managedSet.remove(instanceId);
-
 		CloudService service = infoService.getService(serviceId);
+
+		tasks.get(serviceId).stop = true;
+		synchronized (tasks.get(serviceId).monitor) {
+			tasks.get(serviceId).monitor.notify();
+		}
+		LOG.info(logId() + "stop monitoring");
 
 		deployment.undeploy(serviceId);
 
@@ -205,43 +206,10 @@ public class Deployment extends Processor {
 		manager.sendLifeCycleEvent(serviceId, serviceId, Action.UNDEPLOYED);
 	}
 
-	public class StatusTask {
-
-		String instanceId;
-		Set<String> groupIds = new HashSet<>();
-		Future thread;
-
-		public StatusTask(String instanceId, String groupId, Future thread) {
-			super();
-			this.instanceId = instanceId;
-			this.thread = thread;
-		}
-
-		public void addGroup(String groupId) {
-			groupIds.add(groupId);
-		}
-
-		public void removeGroup(String groupId) {
-			groupIds.remove(groupId);
-		}
-
-		public boolean stopIfNoGroup() {
-			if (groupIds.isEmpty()) {
-				thread.cancel(true);
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		public Future getThread() {
-			return thread;
-		}
-
-		public void setThread(Future thread) {
-			this.thread = thread;
-		}
-
+	public class Signal {
+		public Boolean stop = false;
+		public Boolean highIntensity = true;
+		public Object monitor = new Object();
 	}
 
 }

@@ -24,20 +24,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import at.ac.tuwien.dsg.comot.m.adapter.general.PerInstanceQueueManager;
-import at.ac.tuwien.dsg.comot.m.common.EpsAdapterStatic;
+import at.ac.tuwien.dsg.comot.m.adapter.general.EpsAdapterManager;
+import at.ac.tuwien.dsg.comot.m.common.EpsAdapterExternal;
 import at.ac.tuwien.dsg.comot.m.cs.adapter.processor.Deployment;
 
 @Component
 @Scope("prototype")
-public class DeploymentAdapterStatic implements EpsAdapterStatic {
+public class DeploymentAdapterStatic implements EpsAdapterExternal {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DeploymentAdapterStatic.class);
 
 	@Autowired
 	protected Deployment processor;
 	@Autowired
-	protected PerInstanceQueueManager manager;
+	protected EpsAdapterManager manager;
 
 	@Override
 	public void start(String participantId, String host, Integer port) throws Exception {

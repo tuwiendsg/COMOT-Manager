@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
@@ -38,6 +38,7 @@ import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
 import at.ac.tuwien.dsg.comot.m.common.event.state.Transition;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
+import at.ac.tuwien.dsg.comot.model.type.State;
 
 @Component
 public class EpsBuilder extends Processor {
@@ -49,16 +50,17 @@ public class EpsBuilder extends Processor {
 	@javax.annotation.Resource
 	public Environment env;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	@Override
 	public Bindings getBindings(String instanceId) {
 
 		return new Bindings()
 				.addLifecycle("*." + Action.CREATED + "." + Type.SERVICE + ".#")
-				.addLifecycle("*." + Action.UNDEPLOYED + "." + Type.SERVICE + ".#")
+				.addLifecycle("*." + Action.REMOVED + "." + Type.SERVICE + ".#")
+				.addLifecycle("*.*.*.TRUE.*." + State.PASSIVE + ".#")
 
-				.addCustom("*." + EpsEvent.EPS_DYNAMIC_REQUESTED + "." + Type.SERVICE + ".*")
+				.addCustom("*." + EpsEvent.EPS_DYNAMIC_REQUESTED + ".*.*")
 				.addCustom("*." + EpsEvent.EPS_DYNAMIC_REMOVED + "." + Type.SERVICE + ".*")
 				.addCustom("*." + EpsEvent.EPS_SUPPORT_ASSIGNED + "." + Type.SERVICE + ".*");
 	}
@@ -76,6 +78,10 @@ public class EpsBuilder extends Processor {
 						null);
 
 			} else if (action == Action.UNDEPLOYED) {
+
+				LOG.info("undeploying aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+				infoService.removeOsuInatance(infoService.getOsuInstanceByServiceId(serviceId).getId());
 
 				manager.sendLifeCycleEvent(serviceId, serviceId, Action.REMOVED);
 

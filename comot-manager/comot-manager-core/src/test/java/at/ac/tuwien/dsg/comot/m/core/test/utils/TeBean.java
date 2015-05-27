@@ -16,7 +16,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *******************************************************************************/
-package at.ac.tuwien.dsg.comot.m.core.test;
+package at.ac.tuwien.dsg.comot.m.core.test.utils;
 
 import java.util.Iterator;
 
@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class TestBean {
+public class TeBean {
 
-	private static final Logger LOG = LoggerFactory.getLogger(TestBean.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TeBean.class);
 
 	@Autowired
 	protected GraphDatabaseService db;

@@ -82,7 +82,7 @@ define(function(require) {
 		},
 		attached : function() {
 
-			comot.getEpsInstancesAll(function(epses) {
+			comot.getEpsInstancesActive(function(epses) {
 				processEpsesInstances(epses);
 				model.allEpsServices(epses);
 

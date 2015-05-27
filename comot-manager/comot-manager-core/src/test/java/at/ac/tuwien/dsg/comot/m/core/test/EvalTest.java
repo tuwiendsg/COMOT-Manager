@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
@@ -35,6 +35,7 @@ import at.ac.tuwien.dsg.comot.m.core.analytics.ResultLine;
 import at.ac.tuwien.dsg.comot.m.core.analytics.TimeAnalyzis;
 import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.TeAgentAdapter;
+import at.ac.tuwien.dsg.comot.m.core.test.utils.TeBean;
 import at.ac.tuwien.dsg.comot.m.recorder.RecorderException;
 import at.ac.tuwien.dsg.comot.m.recorder.repo.ChangeRepo;
 import at.ac.tuwien.dsg.comot.m.recorder.revisions.RevisionApi;
@@ -59,7 +60,7 @@ public class EvalTest extends AbstractTest {
 	@Autowired
 	protected ElasticityAnalyzis elAnalysis;
 	@Autowired
-	protected TestBean testBean;
+	protected TeBean testBean;
 
 	int number = 5;
 
@@ -116,14 +117,14 @@ public class EvalTest extends AbstractTest {
 			coordinator.createDynamicService(salsaOsu.getId());
 		}
 
-		for (int i = 0; i < number; i++) {
-			agent.waitForCustomEvent(EpsEvent.EPS_DYNAMIC_CREATED.toString());
-		}
+		// for (int i = 0; i < number; i++) {
+		// agent.waitForCustomEvent(EpsEvent.EPS_DYNAMIC_CREATED.toString());
+		// }
 
 		LOG.info("ALL SALSAS CREATED");
 
 		List<String> services = new ArrayList<>();
-		List<OsuInstance> salsas = infoService.getEpsInstances(InformationClient.USER_MANAGED);
+		List<OsuInstance> salsas = infoService.getEpsInstances(InfoClient.USER_MANAGED);
 
 		UtilsT.sleepSeconds(300);
 

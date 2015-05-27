@@ -64,7 +64,7 @@ public abstract class Manager implements IManager {
 	protected String participantId;
 	protected IProcessor processor;
 
-	public void startStandalone(String baseUri, OfferedServiceUnit eps, IProcessor processor) {
+	public void startStandalone(String baseUri, OfferedServiceUnit eps, IProcessor processor) throws Exception {
 
 		Client client = ClientBuilder.newClient();
 
@@ -78,7 +78,7 @@ public abstract class Manager implements IManager {
 		start(epsInstanceId, processor);
 	}
 
-	public void start(String participantId, IProcessor processor) {
+	public void start(String participantId, IProcessor processor) throws Exception {
 		this.participantId = participantId;
 		this.processor = processor;
 

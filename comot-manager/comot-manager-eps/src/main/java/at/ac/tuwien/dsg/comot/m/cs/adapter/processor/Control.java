@@ -35,7 +35,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -66,7 +66,7 @@ public class Control extends Processor implements ControlEventsListener {
 	@Autowired
 	protected ControlClient control;
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	protected Set<String> managedSet = Collections.synchronizedSet(new HashSet<String>());
 	protected Set<String> controlledSet = Collections.synchronizedSet(new HashSet<String>());

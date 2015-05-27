@@ -58,8 +58,6 @@ public class DeploymentTest extends AbstractTest {
 		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
 		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
 
-		LOG.info("aaaaaaaaaaaaaaaaaa " + staticDeplId);
-
 		// Definitions tosca1 = UtilsCs.loadTosca("./../resources/test/tomcat/tomcat_from_salsa.xml");
 		Definitions tosca1 = UtilsCs.loadTosca("./../resources/test/tosca/ExampleExecutableOnVM.xml");
 
@@ -74,8 +72,6 @@ public class DeploymentTest extends AbstractTest {
 
 	@After
 	public void clean() throws EpsException {
-
-		infoService.deleteAll();
 
 		if (serviceId != null && deployment.isManaged(serviceId)) {
 			UtilsT.sleepSeconds(10);

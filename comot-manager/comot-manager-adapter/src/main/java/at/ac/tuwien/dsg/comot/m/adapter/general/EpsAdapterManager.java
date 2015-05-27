@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.UtilsLc;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
-import at.ac.tuwien.dsg.comot.m.common.InformationClient;
+import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
@@ -47,12 +47,12 @@ import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 
 @Component
 @Scope("prototype")
-public class PerInstanceQueueManager extends Manager {
+public class EpsAdapterManager extends Manager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PerInstanceQueueManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EpsAdapterManager.class);
 
 	@Autowired
-	protected InformationClient infoService;
+	protected InfoClient infoService;
 
 	protected SimpleMessageListenerContainer container;
 	protected Map<String, SimpleMessageListenerContainer> containers = new HashMap<>();
