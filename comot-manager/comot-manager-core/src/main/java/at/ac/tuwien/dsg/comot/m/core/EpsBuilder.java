@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
 import at.ac.tuwien.dsg.comot.m.adapter.general.Processor;
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -37,7 +38,10 @@ import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
 import at.ac.tuwien.dsg.comot.m.common.event.state.Transition;
+import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
+import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
+import at.ac.tuwien.dsg.comot.model.provider.OsuInstance;
 import at.ac.tuwien.dsg.comot.model.type.State;
 
 @Component
@@ -72,14 +76,19 @@ public class EpsBuilder extends Processor {
 		if (infoService.isServiceOfDynamicEps(serviceId)) {
 
 			if (action == Action.CREATED) {
-				String staticDeplId = infoService.instanceIdOfStaticEps(env.getProperty("eps.deployment.central"));
+
+				String deploymentName = env.getProperty(ConfigConstants.DEPL_CENTRAL);
+
+				if (deploymentName == null) {
+					throw new ComotException("No central deployment EPS configured.");
+				}
+
+				String staticDeplId = infoService.instanceIdOfStaticEps(deploymentName);
 
 				manager.sendCustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(), staticDeplId,
 						null);
 
 			} else if (action == Action.UNDEPLOYED) {
-
-				LOG.info("undeploying aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
 				infoService.removeOsuInatance(infoService.getOsuInstanceByServiceId(serviceId).getId());
 
@@ -107,7 +116,23 @@ public class EpsBuilder extends Processor {
 
 		} else if (action == EpsEvent.EPS_DYNAMIC_REMOVED) {
 
-			manager.sendLifeCycleEvent(serviceId, serviceId, Action.STOP);
+			boolean supporting = false;
+
+			for (CloudService service : infoService.getServices()) {
+				for (OsuInstance inst : service.getSupport()) {
+					if (inst.getId().equals(optionalMessage)) {
+						supporting = true;
+					}
+				}
+			}
+
+			if (supporting) {
+				throw new ComotIllegalArgumentException("The EPS instance '" + optionalMessage
+						+ "' can not be removed, if it is assigned to a cloud service.");
+			} else {
+				manager.sendLifeCycleEvent(serviceId, serviceId, Action.STOP);
+			}
+
 		}
 	}
 

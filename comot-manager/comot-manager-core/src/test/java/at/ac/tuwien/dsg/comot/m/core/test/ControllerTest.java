@@ -22,10 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.oasis.tosca.Definitions;
@@ -34,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
@@ -42,8 +39,6 @@ import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
-import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
-import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
 import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
 import at.ac.tuwien.dsg.comot.m.core.test.utils.LoadGenerator;
@@ -55,9 +50,6 @@ import at.ac.tuwien.dsg.comot.model.devel.structure.ServiceUnit;
 import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
 import at.ac.tuwien.dsg.comot.model.type.DirectiveType;
 import at.ac.tuwien.dsg.comot.model.type.State;
-
-import com.rabbitmq.client.ConsumerCancelledException;
-import com.rabbitmq.client.ShutdownSignalException;
 
 public class ControllerTest extends AbstractTest {
 
@@ -80,7 +72,7 @@ public class ControllerTest extends AbstractTest {
 		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
 		staticMonitoringId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.MELA_SERVICE_STATIC);
 		staticControlId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.RSYBL_SERVICE_STATIC);
-		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
+		agent = new TeAgentAdapter("prototype", env.getProperty(ConfigConstants.BROKER_HOST));
 		generator = new LoadGenerator();
 
 		Definitions tosca1 = UtilsCs.loadTosca(UtilsT.TEST_FILE_BASE
@@ -136,9 +128,7 @@ public class ControllerTest extends AbstractTest {
 	}
 
 	@Test
-	public void testInsertExistingAndControl() throws ShutdownSignalException,
-			ConsumerCancelledException,
-			EpsException, JAXBException, ComotException, IOException, InterruptedException {
+	public void testInsertExistingAndControl() throws Exception {
 
 		// insertExistingRunningInstanceOfThisServiceToSystem("HelloElasticityNoDB");
 		insertExistingRunningInstanceOfThisServiceToSystem(serviceId);
@@ -167,9 +157,7 @@ public class ControllerTest extends AbstractTest {
 	@Autowired
 	protected RabbitTemplate amqp;
 
-	public void insertExistingRunningInstanceOfThisServiceToSystem(String serviceId) throws JAXBException,
-			ComotException, IOException, ShutdownSignalException, ConsumerCancelledException,
-			InterruptedException {
+	public void insertExistingRunningInstanceOfThisServiceToSystem(String serviceId) throws Exception {
 
 		LOG.info("serviceId {}", serviceId);
 

@@ -112,7 +112,8 @@ public abstract class Manager implements IManager {
 		sendLifeCycle(new LifeCycleEventModifying(serviceId, groupId, action, parentId, instance));
 	}
 
-	protected void sendLifeCycle(LifeCycleEvent event) throws JAXBException {
+	@Override
+	public void sendLifeCycle(LifeCycleEvent event) throws JAXBException {
 
 		event.setOrigin(getId());
 		event.setTime(System.currentTimeMillis());
@@ -127,13 +128,34 @@ public abstract class Manager implements IManager {
 	}
 
 	@Override
+	public void sendCustomEvent(String serviceId, String groupId, String eventName, String epsId, String message,
+			String correlationId) throws JAXBException {
+
+		CustomEvent event = new CustomEvent(serviceId, groupId, eventName, epsId, message);
+		event.setCorrelationId(correlationId);
+
+		LOG.info("correlationId {}", correlationId);
+
+		sendCustomEvent(event);
+	}
+
+	@Override
 	public void sendCustomEvent(String serviceId, String groupId, String eventName, String epsId, String message)
 			throws JAXBException {
 
-		CustomEvent event = new CustomEvent(serviceId, groupId, eventName, getId(), System.currentTimeMillis(), epsId,
-				message);
+		CustomEvent event = new CustomEvent(serviceId, groupId, eventName, epsId, message);
 
-		String bindingKey = serviceId + "." + event.getClass().getSimpleName() + "." + eventName + "." + groupId;
+		sendCustomEvent(event);
+	}
+
+	@Override
+	public void sendCustomEvent(CustomEvent event) throws JAXBException {
+
+		event.setOrigin(getId());
+		event.setTime(System.currentTimeMillis());
+
+		String bindingKey = event.getServiceId() + "." + event.getClass().getSimpleName() + "."
+				+ event.getCustomEvent() + "." + event.getGroupId();
 
 		LOG.info(logId() + "EVENT-CUST key={}", bindingKey);
 

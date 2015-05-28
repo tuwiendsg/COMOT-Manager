@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -70,7 +71,7 @@ public class EvalTest extends AbstractTest {
 	public void oneSALSA() throws Exception {
 
 		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
-		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
+		agent = new TeAgentAdapter("prototype", env.getProperty(ConfigConstants.BROKER_HOST));
 
 		List<String> services = new ArrayList<>();
 
@@ -107,14 +108,14 @@ public class EvalTest extends AbstractTest {
 	public void multipleDynamicSALSA() throws Exception {
 
 		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
-		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
+		agent = new TeAgentAdapter("prototype", env.getProperty(ConfigConstants.BROKER_HOST));
 
 		// deploy dynamic salsas
 		for (int i = 0; i < number; i++) {
 			UtilsT.sleepSeconds(delay);
 
 			OfferedServiceUnit salsaOsu = infoService.getOsu(AppContextCoreInsertData.SALSA_SERVICE_DYNAMIC);
-			coordinator.createDynamicService(salsaOsu.getId());
+			coordinator.createDynamicEps(salsaOsu.getId(), null);
 		}
 
 		// for (int i = 0; i < number; i++) {

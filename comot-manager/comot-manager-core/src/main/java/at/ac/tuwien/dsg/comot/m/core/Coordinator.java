@@ -23,7 +23,7 @@
  */
 package at.ac.tuwien.dsg.comot.m.core;
 
-import java.io.IOException;
+import java.io.File;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
@@ -37,12 +37,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
-import at.ac.tuwien.dsg.comot.m.adapter.general.Manager;
-import at.ac.tuwien.dsg.comot.m.adapter.general.SingleQueueManager;
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.EpsAdapterExternal;
 import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
+import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.Utils;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
@@ -50,14 +50,16 @@ import at.ac.tuwien.dsg.comot.m.common.event.AbstractEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.CustomEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEvent;
 import at.ac.tuwien.dsg.comot.m.common.event.LifeCycleEventModifying;
-import at.ac.tuwien.dsg.comot.m.common.event.state.ComotMessage;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.ToscaMapper;
+import at.ac.tuwien.dsg.comot.model.devel.relationship.ConnectToRel;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
+import at.ac.tuwien.dsg.comot.model.devel.structure.ServiceUnit;
 import at.ac.tuwien.dsg.comot.model.provider.OfferedServiceUnit;
 import at.ac.tuwien.dsg.comot.model.provider.OsuInstance;
 import at.ac.tuwien.dsg.comot.model.provider.Resource;
+import at.ac.tuwien.dsg.comot.model.provider.ResourceOrQualityType;
 
 @Component
 public class Coordinator {
@@ -65,7 +67,10 @@ public class Coordinator {
 	private static final Logger LOG = LoggerFactory.getLogger(Coordinator.class);
 
 	public static final String USER_ID = "Some_User";
-	public static final long TIMEOUT = 30000;
+	public static final long TIMEOUT = 60000;
+	public static final String FILE_SUFFIX = ".tar.gz";
+	public static final String UPLOADS_DIR = "temp/";
+	public static final String ADAPTER_ID = "adapter";
 
 	@Autowired
 	protected ApplicationContext context;
@@ -162,40 +167,74 @@ public class Coordinator {
 	}
 
 	public void assignSupportingOsu(String serviceId, String osuInstanceId)
-			throws IOException, JAXBException {
+			throws Exception {
 
 		LOG.info("coord assign {} {}", serviceId, osuInstanceId);
 
-		sendCustom(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(), osuInstanceId, null));
-	}
-
-	public void removeAssignmentOfSupportingOsu(String serviceId, String osuInstanceId)
-			throws ClassNotFoundException, IOException, JAXBException {
-
-		sendCustom(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REMOVED.toString(),
+		sendAndWaitCorrelationId(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(),
 				osuInstanceId, null));
 	}
 
-	public String createDynamicService(String epsId) throws JAXBException, EpsException {
+	public void removeAssignmentOfSupportingOsu(String serviceId, String osuInstanceId)
+			throws Exception {
 
-		String serviceId = infoService.createOsuInstance(epsId);
-
-		sendCustom(new CustomEvent(null, null, EpsEvent.EPS_DYNAMIC_REQUESTED.toString(), null, serviceId));
-
-		LOG.info("coord {}", serviceId);
-
-		return serviceId;
+		sendAndWaitForId(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REMOVED.toString(),
+				osuInstanceId, null));
 	}
 
-	public void removeDynamicService(String epsId, String epsInstanceId) throws JAXBException,
-			EpsException {
+	public String createDynamicEps(String epsId, File file) throws Exception {
+
+		String epsInstanceId = infoService.createOsuInstance(epsId);
+
+		if (file != null) {
+
+			String user = env.getProperty(ConfigConstants.REPO_USERNAME);
+			String host = env.getProperty(ConfigConstants.REPO_HOST);
+			String pem = env.getProperty(ConfigConstants.RESOURCE_PATH) + env.getProperty(ConfigConstants.REPO_PEM);
+			String rPath = env.getProperty(ConfigConstants.REPO_PATH);
+			String rFile = UUID.randomUUID() + FILE_SUFFIX;
+
+			UtilsFile.upload(file, host, rPath + rFile, user, new File(pem));
+
+			CloudService service = infoService.getOsuInstance(epsInstanceId).getService();
+			insertConfigToTosca(service, rFile);
+			infoService.updateService(service);
+		}
+
+		sendAndWaitForId(new CustomEvent(null, null, EpsEvent.EPS_DYNAMIC_REQUESTED.toString(), null, epsInstanceId));
+
+		return epsInstanceId;
+	}
+
+	protected void insertConfigToTosca(CloudService service, String rFile) throws EpsException {
+
+		Navigator nav = new Navigator(service);
+
+		for (ServiceUnit unit : nav.getAllUnits()) {
+			for (ConnectToRel rel : unit.getConnectTo()) {
+				if (ADAPTER_ID.equals(rel.getTo().getId())) {
+
+					Resource url = new Resource(
+							env.getProperty(ConfigConstants.REPO_URL) + rFile,
+							new ResourceOrQualityType(ResourceOrQualityType.ART_REFERENCE_TYPE));
+					Resource tarGz = new Resource("configuration", new ResourceOrQualityType("misc"));
+					tarGz.hasResource(url);
+					unit.getOsuInstance().getOsu().hasResource(tarGz);
+
+					return;
+				}
+			}
+		}
+	}
+
+	public void removeDynamicEps(String epsId, String epsInstanceId) throws Exception {
 
 		OsuInstance osuInatance = infoService.getOsuInstance(epsInstanceId);
 
 		String serviceId = osuInatance.getService().getId();
 
-		sendCustom(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_DYNAMIC_REMOVED.toString(),
-				Constants.EPS_BUILDER, null));
+		sendAndWaitForId(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_DYNAMIC_REMOVED.toString(),
+				Constants.EPS_BUILDER, epsInstanceId));
 
 	}
 
@@ -203,13 +242,13 @@ public class Coordinator {
 			String serviceId,
 			String epsId,
 			String eventId,
-			String optionalInput) throws JAXBException {
+			String optionalInput) throws Exception {
 
 		if (StringUtils.isBlank(eventId)) {
 			return;
 		}
 
-		sendCustom(new CustomEvent(serviceId, serviceId, eventId, epsId, optionalInput));
+		sendAndWaitForId(new CustomEvent(serviceId, serviceId, eventId, epsId, optionalInput));
 
 	}
 
@@ -217,31 +256,33 @@ public class Coordinator {
 
 		final String evantId = event.getEventId();
 
-		CoordinatorAdapter processor = new CoordinatorAdapter(event.getServiceId(), this) {
+		CoordinatorAdapter processor = new CoordinatorAdapter(event, this, context) {
 			@Override
-			public void process(AbstractEvent event, boolean exception, ComotMessage msg) {
+			public void process(AbstractEvent event, boolean exception) {
 				if (event.getEventId().equals(evantId)) {
-					response = msg;
 					signal.result = !exception;
 				}
 			}
+		};
 
+		processor.send();
+	}
+
+	protected void sendAndWaitCorrelationId(final AbstractEvent event) throws Exception {
+
+		final String evantId = event.getEventId();
+
+		CoordinatorAdapter processor = new CoordinatorAdapter(event, this, context) {
 			@Override
-			public void sendInternal() throws JAXBException {
-				if (event instanceof LifeCycleEvent) {
-					coordinator.sendLifeCycle((LifeCycleEvent) event);
-				} else {
-					coordinator.sendCustom((CustomEvent) event);
-				}
+			public void process(AbstractEvent event, boolean exception) {
 
+				if (event.getCorrelationId().equals(evantId)) {
+					signal.result = !exception;
+				}
 			}
 		};
 
-		Manager manager = context.getBean(SingleQueueManager.class);
-		manager.start("C_" + UUID.randomUUID().toString(), processor);
-
 		processor.send();
-
 	}
 
 	protected void sendLifeCycle(LifeCycleEvent event) throws JAXBException {

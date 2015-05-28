@@ -18,10 +18,12 @@
  *******************************************************************************/
 package at.ac.tuwien.dsg.comot.m.ui.service;
 
-import java.io.IOException;
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -34,8 +36,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
 
+import org.apache.commons.io.FileUtils;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +50,7 @@ import org.springframework.stereotype.Service;
 import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
 import at.ac.tuwien.dsg.comot.m.common.MngPath;
-import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
+import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.core.Coordinator;
 import at.ac.tuwien.dsg.comot.m.core.lifecycle.LifeCycleManager;
@@ -77,8 +82,6 @@ public class EpsResource {
 	@javax.annotation.Resource
 	public Environment env;
 
-	private static final String UPLOADS_DIR = "uploads/";
-
 	@POST
 	@Path(MngPath.INIT_EPS_EXTERNAL)
 	@Produces(MediaType.TEXT_PLAIN)
@@ -93,52 +96,38 @@ public class EpsResource {
 		return Response.ok(epsInstanceId).build();
 	}
 
-	// @POST
-	// @Path("/{epsId}/instances")
-	// @Consumes(MediaType.MULTIPART_FORM_DATA)
-	// @Produces(MediaType.TEXT_PLAIN)
-	// @ApiOperation(
-	// value = "Create a new instance of the user-managed EPS",
-	// response = String.class)
-	// public Response createDynamicEpsInstance(
-	// @ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId,
-	// @ApiParam(value = "Configuration file", required = false) FormDataMultiPart form)
-	// throws ComotException, ClassNotFoundException, IOException, JAXBException {
-	//
-	// // get file
-	// FormDataBodyPart filePart = form.getField("file");
-	// ContentDisposition headerOfFilePart = filePart.getContentDisposition();
-	// InputStream fileInputStream = filePart.getValueAs(InputStream.class);
-	// String filePath = UPLOADS_DIR + headerOfFilePart.getFileName();
-	//
-	// // save file
-	// File newFile = new File(filePath);
-	// newFile.getParentFile().mkdirs();
-	// FileUtils.copyInputStreamToFile(fileInputStream, newFile);
-	//
-	// String serviceInstanceId = "aaa " + filePath;
-
-	// LOG.info(serviceInstanceId);
-	//
-	// return Response.ok(serviceInstanceId).build();
-	// }
-
 	@POST
 	@Path("/{epsId}/instances")
-	@Consumes(MediaType.WILDCARD)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.TEXT_PLAIN)
 	@ApiOperation(
 			value = "Create a new instance of the user-managed EPS",
 			response = String.class)
 	public Response createDynamicEpsInstance(
-			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId)
-			throws ComotException, ClassNotFoundException, IOException, JAXBException {
+			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId,
+			@ApiParam(value = Coordinator.FILE_SUFFIX + " file containing the configuration files", required = false) FormDataMultiPart form)
+			throws Exception {
 
-		String serviceInstanceId = coordinator.createDynamicService(epsId);
+		// get file
+		FormDataBodyPart filePart = form.getField("file");
+		ContentDisposition headerOfFilePart = filePart.getContentDisposition();
+		InputStream fileInputStream = filePart.getValueAs(InputStream.class);
+		String fileName = headerOfFilePart.getFileName();
 
-		LOG.info(serviceInstanceId);
+		if (fileName == null || !fileName.endsWith(Coordinator.FILE_SUFFIX)) {
+			throw new ComotIllegalArgumentException("'" + fileName + "' is not a " + Coordinator.FILE_SUFFIX + " file!");
+		}
 
-		return Response.ok(serviceInstanceId).build();
+		String filePath = Coordinator.UPLOADS_DIR + UUID.randomUUID() + "/" + fileName;
+
+		// save file
+		File newFile = new File(filePath);
+		newFile.getParentFile().mkdirs();
+		FileUtils.copyInputStreamToFile(fileInputStream, newFile);
+
+		String serviceId = coordinator.createDynamicEps(epsId, newFile);
+
+		return Response.ok(serviceId).build();
 	}
 
 	@DELETE
@@ -148,9 +137,9 @@ public class EpsResource {
 	public Response removeDynamicEpsInstance(
 			@ApiParam(value = "ID of the EPS instance", required = true) @PathParam("epsInstanceId") String epsInstanceId,
 			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId)
-			throws ComotException, ClassNotFoundException, IOException, JAXBException {
+			throws Exception {
 
-		coordinator.removeDynamicService(epsId, epsInstanceId);
+		coordinator.removeDynamicEps(epsId, epsInstanceId);
 		return Response.ok().build();
 	}
 
@@ -226,6 +215,7 @@ public class EpsResource {
 			allEpsInstances = infoServ.getEpsInstances(InfoClient.EXTERNAL);
 
 			for (OsuInstance oneInstance : infoServ.getEpsInstances(InfoClient.USER_MANAGED)) {
+
 				state = lcManager.getCurrentStateService(oneInstance.getService().getId());
 
 				LOG.info("state {}", state);

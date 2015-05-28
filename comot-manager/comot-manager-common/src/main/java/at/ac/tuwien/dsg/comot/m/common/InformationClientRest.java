@@ -105,6 +105,16 @@ public class InformationClientRest extends ServiceClient {
 		return result;
 	}
 
+	public void updateService(CloudService service) throws EpsException {
+
+		Response response = client.target(baseUri)
+				.path(InfoServiceUtils.SERVICE_ONE)
+				.resolveTemplate("serviceId", service.getId())
+				.request(MediaType.TEXT_PLAIN)
+				.put(Entity.xml(service));
+		processResponseStatus(response);
+	}
+
 	public String createServiceFromTemplate(String templateId) throws EpsException {
 
 		Response response = client.target(baseUri)

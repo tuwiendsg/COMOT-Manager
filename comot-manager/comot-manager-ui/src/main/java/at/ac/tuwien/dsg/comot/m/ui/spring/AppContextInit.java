@@ -22,10 +22,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCore;
 
 @Configuration
-@PropertySource({ "${config.path}/init.properties" })
+@PropertySource({ "${" + ConfigConstants.CONFIG_PATH + "}/init.properties" })
 @Profile(AppContextCore.INSERT_INIT_DATA)
 public class AppContextInit {
 

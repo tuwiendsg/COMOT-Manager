@@ -5,3 +5,5 @@ resources/adapterRsybl/rsybl
 log.txt
 messages.log
 /bin/
+uploads/
+temp/

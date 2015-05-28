@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.Constants;
 import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
@@ -91,15 +92,15 @@ public class AppContextCoreInsertData {
 
 	public void setUpTestData() throws AmqpException, JAXBException, ComotException {
 
-		String fileBase = env.getProperty("dir.files");
+		String fileBase = env.getProperty(ConfigConstants.RESOURCE_PATH);
 
 		URI deploymentUri;
 		URI monitoringUri;
 		URI controllerUri;
 		try {
-			deploymentUri = new URI(env.getProperty("uri.deployemnt"));
-			monitoringUri = new URI(env.getProperty("uri.monitoring"));
-			controllerUri = new URI(env.getProperty("uri.controller"));
+			deploymentUri = new URI(env.getProperty(ConfigConstants.URI_DEPLOYEMENT));
+			monitoringUri = new URI(env.getProperty(ConfigConstants.URI_MONITORING));
+			controllerUri = new URI(env.getProperty(ConfigConstants.URI_CONTROLLER));
 		} catch (URISyntaxException e1) {
 			throw new ComotAdapterException(e1);
 		}

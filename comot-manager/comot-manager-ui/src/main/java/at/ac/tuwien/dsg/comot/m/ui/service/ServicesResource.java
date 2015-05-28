@@ -56,7 +56,6 @@ import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InfoServiceUtils;
 import at.ac.tuwien.dsg.comot.m.common.Navigator;
 import at.ac.tuwien.dsg.comot.m.common.enums.Type;
-import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.core.Coordinator;
@@ -206,7 +205,7 @@ public class ServicesResource {
 	public Response assignSupportingEps(
 			@ApiParam(value = "ID of the cloud service", required = true) @PathParam("serviceId") String serviceId,
 			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId)
-			throws ComotException, ClassNotFoundException, IOException, JAXBException {
+			throws Exception {
 
 		coordinator.assignSupportingOsu(serviceId, epsId);
 		return Response.ok().build();
@@ -219,7 +218,7 @@ public class ServicesResource {
 	public Response removeSupportingEps(
 			@ApiParam(value = "ID of the cloud service", required = true) @PathParam("serviceId") String serviceId,
 			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId)
-			throws ComotException, ClassNotFoundException, IOException, JAXBException {
+			throws Exception {
 
 		coordinator.removeAssignmentOfSupportingOsu(serviceId, epsId);
 		return Response.ok().build();
@@ -236,7 +235,7 @@ public class ServicesResource {
 			@ApiParam(value = "ID of the EPS", required = true) @PathParam("epsId") String epsId,
 			@ApiParam(value = "Name of the custom event", required = true) @PathParam("eventName") String eventName,
 			@ApiParam(value = "Optional message", required = false) String optionalInput)
-			throws ComotException, ClassNotFoundException, IOException, JAXBException {
+			throws Exception {
 
 		coordinator.triggerCustomEvent(serviceId, epsId, eventName, optionalInput);
 		return Response.ok().build();

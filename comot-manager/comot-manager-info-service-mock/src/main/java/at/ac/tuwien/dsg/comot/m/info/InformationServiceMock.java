@@ -105,7 +105,7 @@ public class InformationServiceMock {
 	public String createService(CloudService service) throws ClassNotFoundException, IOException {
 
 		if (services.containsKey(service.getId())) {
-			throw new ComotIllegalArgumentException("A Template with the ID '" + service.getId() + "' alreadty exists.");
+			throw new ComotIllegalArgumentException("A Service with the ID '" + service.getId() + "' alreadty exists.");
 		}
 
 		service.setDateCreated(System.currentTimeMillis());
@@ -140,6 +140,19 @@ public class InformationServiceMock {
 
 	public void removeService(String serviceId) {
 		services.remove(serviceId);
+	}
+
+	public void updateService(String serviceId, CloudService service) {
+
+		if (services.containsKey(serviceId)) {
+			services.put(serviceId, service);
+		}
+
+		for (OsuInstance instance : osuInstances.values()) {
+			if (instance.getService() != null && instance.getService().getId().equals(serviceId)) {
+				instance.setService(service);
+			}
+		}
 	}
 
 	public void reconfigureElasticity(String serviceId, CloudService elConfig) {

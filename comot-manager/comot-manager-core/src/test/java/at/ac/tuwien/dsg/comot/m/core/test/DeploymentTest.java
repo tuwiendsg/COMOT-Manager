@@ -31,6 +31,7 @@ import org.oasis.tosca.Definitions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.enums.EpsEvent;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
@@ -56,7 +57,7 @@ public class DeploymentTest extends AbstractTest {
 		UtilsT.sleepSeconds(1);
 
 		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
-		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
+		agent = new TeAgentAdapter("prototype", env.getProperty(ConfigConstants.BROKER_HOST));
 
 		// Definitions tosca1 = UtilsCs.loadTosca("./../resources/test/tomcat/tomcat_from_salsa.xml");
 		Definitions tosca1 = UtilsCs.loadTosca("./../resources/test/tosca/ExampleExecutableOnVM.xml");

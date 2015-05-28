@@ -22,8 +22,12 @@
 			
 			<ns2:NodeTemplate name="rSYBL" minInstances="1" maxInstances="1" id="rsybl" type="salsa:software">
 				<ns2:Properties>
-					<MappingProperties />
-				</ns2:Properties>
+                    <MappingProperties>
+                        <MappingProperty type="action">
+                            <property name="deploy">./rSYBL-service start</property>
+                        </MappingProperty>
+                    </MappingProperties>
+                </ns2:Properties>
 				<ns2:Capabilities>
 					<ns2:Capability id="rsybl_capa" type="salsa:variable"/>
 				</ns2:Capabilities>
@@ -31,19 +35,25 @@
 					<ns2:Requirement  id="mela_req" type="salsa:variable"/>
 				</ns2:Requirements>
 				<ns2:DeploymentArtifacts>
-					<ns2:DeploymentArtifact name="Deployment script" artifactType="salsa:sh" artifactRef="rsybl_package" />
+					<ns2:DeploymentArtifact name="Executable jar" artifactType="salsa:misc" artifactRef="mela_jar" />
+					<ns2:DeploymentArtifact name="Start script" artifactType="salsa:misc" artifactRef="mela_sh" />
 				</ns2:DeploymentArtifacts>
 			</ns2:NodeTemplate>
 			
 			<ns2:NodeTemplate name="MELA" minInstances="1" maxInstances="1" id="mela" type="salsa:software">
 				<ns2:Properties>
-					<MappingProperties />
-				</ns2:Properties>
+                    <MappingProperties>
+                        <MappingProperty type="action">
+                            <property name="deploy">./mela-data-service start</property>
+                        </MappingProperty>
+                    </MappingProperties>
+                </ns2:Properties>
 				<ns2:Capabilities>
 					<ns2:Capability  id="mela_capa" type="salsa:variable"/>
 				</ns2:Capabilities>
 				<ns2:DeploymentArtifacts>
-					<ns2:DeploymentArtifact name="Deployment script" artifactType="salsa:sh" artifactRef="mela_package" />
+					<ns2:DeploymentArtifact name="Executable jar" artifactType="salsa:misc" artifactRef="rsybl_jar" />
+					<ns2:DeploymentArtifact name="Start script" artifactType="salsa:misc" artifactRef="rsybl_sh" />
 				</ns2:DeploymentArtifacts>
 			</ns2:NodeTemplate>
 			
@@ -85,17 +95,27 @@
 	</ns2:ServiceTemplate>
 	<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="adapterJar" type="salsa:misc">
 		<ns2:ArtifactReferences>
-			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/dynamic_eps/epsAdapter.jar" />
+			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/eps/epsAdapter.jar" />
 		</ns2:ArtifactReferences>
 	</ns2:ArtifactTemplate>
-	<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="mela_package" type="salsa:sh">
+	<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="mela_sh" type="salsa:misc">
 		<ns2:ArtifactReferences>
-			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/dynamic_eps/deployMela.sh" />
+			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/eps/mela-data-service" />
 		</ns2:ArtifactReferences>
 	</ns2:ArtifactTemplate>
-	<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="rsybl_package" type="salsa:sh">
+	<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="mela_jar" type="salsa:misc">
 		<ns2:ArtifactReferences>
-			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/dynamic_eps/deployRsybl.sh" />
+			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/eps/MELA-DataService-3.0-SNAPSHOT-war-exec.jar" />
+		</ns2:ArtifactReferences>
+	</ns2:ArtifactTemplate>
+		<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="rsybl_sh" type="salsa:misc">
+		<ns2:ArtifactReferences>
+			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/eps/rSYBL-service" />
+		</ns2:ArtifactReferences>
+	</ns2:ArtifactTemplate>
+	<ns2:ArtifactTemplate xmlns:salsa="http://example.com" id="rsybl_jar" type="salsa:misc">
+		<ns2:ArtifactReferences>
+			<ns2:ArtifactReference reference="http://128.130.172.215/salsa/upload/files/juraj/eps/rSYBL-analysis-engine-1.0-SNAPSHOT-war-exec.jar" />
 		</ns2:ArtifactReferences>
 	</ns2:ArtifactTemplate>
 </ns2:Definitions>

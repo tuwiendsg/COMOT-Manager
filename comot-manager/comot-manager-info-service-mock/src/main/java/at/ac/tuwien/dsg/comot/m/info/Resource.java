@@ -125,6 +125,18 @@ public class Resource {
 		return Response.ok(result).build();
 	}
 
+	@PUT
+	@Produces(MediaType.TEXT_PLAIN)
+	@Path(InfoServiceUtils.SERVICE_ONE)
+	public Response updateService(@PathParam("serviceId") String serviceId, CloudService service)
+			throws ClassNotFoundException, IOException {
+
+		synchronized (sync) {
+			infoServ.updateService(serviceId, service);
+		}
+		return Response.ok().build();
+	}
+
 	@DELETE
 	@Path(InfoServiceUtils.SERVICE_ONE)
 	public Response deleteService(

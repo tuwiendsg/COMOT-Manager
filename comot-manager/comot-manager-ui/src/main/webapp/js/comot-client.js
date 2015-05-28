@@ -58,14 +58,20 @@
 		// ERROR
 		if (isFunction(onError)) {
 			core.error = onError;
+			
 		} else if (onError === null || typeof onError === 'undefined') {
 			core.error = function(request, status, error) {
-				console.log("status: " + request.status + "(" + request.statusText + "), "
-						+ errorBody(request.responseText));
+
+				notify.error("Failed. \n Reason: " + request.status + request.statusText);
 			}
 		} else if (typeof onError === 'string') {
 			core.error = function(request, status, error) {
-				notify.error(onError);
+				
+				if (request.responseText === "") {
+					notify.error(onError);
+				} else {
+					notify.error(onError + "\n Reason: " + request.responseText);
+				}
 			}
 		}
 
@@ -87,33 +93,6 @@
 	function isFunction(functionToCheck) {
 		var getType = {};
 		return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
-	}
-
-	function errorBody(responseText) {
-		var msg = "";
-
-		try {
-			var obj = $.parseJSON(responseText)
-
-			if (typeof obj.origin !== 'undefined') {
-				msg = msg + "component: " + obj.origin
-			}
-			if (typeof obj.message !== 'undefined') {
-				if (msg !== "") {
-					msg = msg + "\n";
-				}
-				msg = msg + "message: " + obj.message
-			}
-
-			return msg;
-
-		} catch (e) {
-			return responseText;
-		}
-	}
-
-	exports.errorBody = function(error) {
-		return errorBody(error);
 	}
 
 	// API
@@ -186,7 +165,7 @@
 
 		var request = getRequestCore(onSuccess, onError);
 		request.type = "PUT";
-		request.url = services + serviceId + "/kill";
+		request.url = services + serviceId + "/terminate";
 		return $.ajax(request);
 	}
 
@@ -224,10 +203,13 @@
 		return $.ajax(request);
 	}
 
-	exports.createDynamicEps = function(epsId, onSuccess, onError) {
+	exports.createDynamicEps = function(epsId, formData, onSuccess, onError) {
 
 		var request = getRequestCore(onSuccess, onError);
 		request.type = "POST";
+		request.data = formData;
+		request.contentType = false; // "multipart/form-data";
+		request.processData = false;
 		request.url = eps + epsId + "/instances";
 		return $.ajax(request);
 	}

@@ -87,6 +87,10 @@ public class InfoClient {
 		return client.createService(service);
 	}
 
+	public void updateService(CloudService service) throws EpsException {
+		client.updateService(service);
+	}
+
 	public String createServiceFromTemplate(String templateId) throws EpsException {
 		return client.createServiceFromTemplate(templateId);
 	}

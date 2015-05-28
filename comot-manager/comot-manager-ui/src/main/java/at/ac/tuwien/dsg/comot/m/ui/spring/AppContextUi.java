@@ -24,17 +24,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCore;
 import at.ac.tuwien.dsg.comot.m.recorder.AppContextServrec;
 
 @Configuration
 @EnableAsync
-@PropertySource({ "classpath:path.properties", "${config.path}/application.properties" })
+@PropertySource({ "classpath:path.properties", "${" + ConfigConstants.CONFIG_PATH + "}/application.properties" })
 @Import({ AppContextCore.class, AppContextServrec.class })
 @ComponentScan("at.ac.tuwien.dsg.comot.m.ui")
 public class AppContextUi {
-
-	public static final String CONFIGURABLE = "CONFIGURABLE";
-	public static final String PRECONFIGURED = "PRECONFIGURED";
 
 }

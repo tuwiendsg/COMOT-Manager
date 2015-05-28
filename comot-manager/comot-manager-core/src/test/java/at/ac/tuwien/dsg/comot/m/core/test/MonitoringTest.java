@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.oasis.tosca.Definitions;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.enums.Action;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
@@ -48,7 +49,7 @@ public class MonitoringTest extends AbstractTest {
 	@Before
 	public void setUp() throws Exception {
 
-		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
+		agent = new TeAgentAdapter("prototype", env.getProperty(ConfigConstants.BROKER_HOST));
 
 		Definitions tosca1 = UtilsCs.loadTosca("./../resources/test/tosca/ExampleExecutableOnVM.xml");
 

@@ -134,7 +134,7 @@ public class EpsAdapterManager extends Manager {
 						infoService.assignEps(serviceId, participantId);
 
 						sendCustomEvent(serviceId, groupId, EpsEvent.EPS_SUPPORT_ASSIGNED.toString(), participantId,
-								null);
+								null, event.getEventId());
 					}
 
 				} else if (action.equals(EpsEvent.EPS_SUPPORT_REMOVED.toString())) {

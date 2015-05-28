@@ -41,6 +41,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.InfoClient;
 import at.ac.tuwien.dsg.comot.m.common.InformationClientRest;
 import at.ac.tuwien.dsg.comot.m.common.eps.ControlClient;
@@ -80,13 +81,13 @@ public class AppContextAdapter {
 	public ConnectionFactory connectionFactory() {
 
 		if (brokerHost == null) {
-			brokerHost = env.getProperty("uri.broker.host");
+			brokerHost = env.getProperty(ConfigConstants.BROKER_HOST);
 		}
 		LOG.info("setting connection to message broker: {}", brokerHost);
 
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(brokerHost);
-		connectionFactory.setUsername(env.getProperty("uri.broker.username"));
-		connectionFactory.setPassword(env.getProperty("uri.broker.password"));
+		connectionFactory.setUsername(env.getProperty(ConfigConstants.BROKER_USERNAME));
+		connectionFactory.setPassword(env.getProperty(ConfigConstants.BROKER_PASSWORD));
 		return connectionFactory;
 	}
 
@@ -107,7 +108,7 @@ public class AppContextAdapter {
 	@Bean
 	public InfoClient informationClient() throws URISyntaxException {
 
-		URI uri = new URI(env.getProperty("uri.information"));
+		URI uri = new URI(env.getProperty(ConfigConstants.URI_INFORMATION));
 
 		if (infoHost != null && infoPort != null) {
 			uri = UriBuilder.fromUri(uri).host(infoHost).port(infoPort).build();
@@ -119,17 +120,17 @@ public class AppContextAdapter {
 
 	@Bean
 	public MonitoringClient monitoringClient() throws URISyntaxException {
-		return new MonitoringClientMela(new MelaClient(new URI(env.getProperty("uri.monitoring"))));
+		return new MonitoringClientMela(new MelaClient(new URI(env.getProperty(ConfigConstants.URI_MONITORING))));
 	}
 
 	@Bean
 	public ControlClient controlClient() throws URISyntaxException {
-		return new ControlClientRsybl(new RsyblClient(new URI(env.getProperty("uri.controller"))));
+		return new ControlClientRsybl(new RsyblClient(new URI(env.getProperty(ConfigConstants.URI_CONTROLLER))));
 	}
 
 	@Bean
 	public DeploymentClient deploymentClient() throws URISyntaxException {
-		return new DeploymentClientSalsa(new SalsaClient(new URI(env.getProperty("uri.deployemnt"))));
+		return new DeploymentClientSalsa(new SalsaClient(new URI(env.getProperty(ConfigConstants.URI_DEPLOYEMENT))));
 	}
 
 	public static String getBrokerHost() {

@@ -177,6 +177,11 @@ public class LifeCycleManager {
 	}
 
 	public State getCurrentStateService(String serviceId) {
+
+		if (!managers.containsKey(serviceId)) {
+			return null;
+		}
+
 		return managers.get(serviceId).getCurrentStateService();
 
 	}

@@ -40,9 +40,9 @@ public class ProcessorListener implements MessageListener {
 	private static final Logger LOG = LoggerFactory.getLogger(ProcessorListener.class);
 
 	protected IProcessor processor;
-	protected IManager manager;
+	protected Manager manager;
 
-	public ProcessorListener(IProcessor processor, IManager manager) {
+	public ProcessorListener(IProcessor processor, Manager manager) {
 		this.processor = processor;
 		this.manager = manager;
 	}

@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBException;
 import org.junit.Before;
 import org.junit.Test;
 
+import at.ac.tuwien.dsg.comot.m.common.ConfigConstants;
 import at.ac.tuwien.dsg.comot.m.common.exception.EpsException;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
 import at.ac.tuwien.dsg.comot.m.core.spring.AppContextCoreInsertData;
@@ -44,18 +45,18 @@ public class DynamicAdapterTest extends AbstractTest {
 	public void setUp() throws JAXBException, IOException, ClassNotFoundException, ShutdownSignalException,
 			ConsumerCancelledException, InterruptedException, EpsException {
 
-		agent = new TeAgentAdapter("prototype", env.getProperty("uri.broker.host"));
+		agent = new TeAgentAdapter("prototype", env.getProperty(ConfigConstants.BROKER_HOST));
 
 		staticDeplId = infoService.instanceIdOfStaticEps(AppContextCoreInsertData.SALSA_SERVICE_STATIC);
 
 	}
 
 	@Test
-	public void testDynamic() throws EpsException, JAXBException {
+	public void testDynamic() throws Exception {
 
 		OfferedServiceUnit melaOsu = infoService.getOsu(AppContextCoreInsertData.RSYBL_SERVICE_DYNAMIC);
 
-		coordinator.createDynamicService(melaOsu.getId());
+		coordinator.createDynamicEps(melaOsu.getId(), null);
 
 		UtilsT.sleepInfinit();
 
