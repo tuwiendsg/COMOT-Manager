@@ -169,8 +169,6 @@ public class Coordinator {
 	public void assignSupportingOsu(String serviceId, String osuInstanceId)
 			throws Exception {
 
-		LOG.info("coord assign {} {}", serviceId, osuInstanceId);
-
 		sendAndWaitCorrelationId(new CustomEvent(serviceId, serviceId, EpsEvent.EPS_SUPPORT_REQUESTED.toString(),
 				osuInstanceId, null));
 	}
@@ -194,22 +192,14 @@ public class Coordinator {
 			String rPath = env.getProperty(ConfigConstants.REPO_PATH);
 			String rFile = UUID.randomUUID() + FILE_SUFFIX;
 
-			LOG.info("aaa");
-
 			UtilsFile.upload(file, host, rPath + rFile, user, new File(pem));
-
-			LOG.info("bbb");
 
 			CloudService service = infoService.getOsuInstance(epsInstanceId).getService();
 			insertConfigToTosca(service, rFile);
 			infoService.updateService(service);
 		}
 
-		LOG.info("ccc");
-
 		sendCustom(new CustomEvent(null, null, EpsEvent.EPS_DYNAMIC_REQUESTED.toString(), null, epsInstanceId));
-
-		LOG.info("ddd");
 
 		return epsInstanceId;
 	}
