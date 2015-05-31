@@ -20,8 +20,8 @@ package at.ac.tuwien.dsg.comot.m.cs.adapter.processor;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBException;
 
@@ -41,7 +41,6 @@ import at.ac.tuwien.dsg.comot.m.common.eps.DeploymentClient;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
 import at.ac.tuwien.dsg.comot.m.cs.mapper.DeploymentMapper;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
-import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
 import at.ac.tuwien.dsg.comot.model.type.State;
 
 @Component
@@ -71,17 +70,8 @@ public class DeploymentHelper {
 
 		try {
 
-			Map<String, String> currentStates = new HashMap<>();
 			Memory memory = new Memory();
-			// boolean notAllRunning;
-
 			UtilsLc.removeProviderInfo(service);
-
-			List<UnitInstance> oldInstances = new Navigator(service).getAllUnitInstances();
-
-			for (UnitInstance inst : oldInstances) {
-				currentStates.put(inst.getId(), DeploymentMapper.runningToState());
-			}
 
 			do {
 				try {
@@ -98,20 +88,7 @@ public class DeploymentHelper {
 						break;
 					}
 
-					memory.refresh(currentStates);
-					currentStates = oneInteration(memory, serviceId, service);
-
-					// detect removed instances
-					for (Iterator<UnitInstance> iterator = oldInstances.iterator(); iterator.hasNext();) {
-						UnitInstance inst = iterator.next();
-
-						if (!currentStates.containsKey(inst.getId())) {
-
-							manager.sendLifeCycleEvent(serviceId, inst.getId(), Action.UNDEPLOYMENT_STARTED);
-							manager.sendLifeCycleEvent(serviceId, inst.getId(), Action.UNDEPLOYED);
-							iterator.remove();
-						}
-					}
+					oneInteration(memory, serviceId, service);
 
 				} catch (ComotException e) {
 					dAdapt.getManager().sendExceptionEvent(serviceId, e);
@@ -134,15 +111,13 @@ public class DeploymentHelper {
 		}
 	}
 
-	protected Map<String, String> oneInteration(Memory memory, String serviceId, CloudService service)
+	protected void oneInteration(Memory memory, String serviceId, CloudService service)
 			throws ComotException, InterruptedException, JAXBException {
 
 		Map<String, String> currentStates = new HashMap<>();
 		CloudService serviceReturned;
 		State lcStateNew;
 		String stateNew;
-
-		currentStates = new HashMap<>();
 
 		serviceReturned = deployment.refreshStatus(currentStates, service);
 		serviceReturned.setId(serviceId);
@@ -159,8 +134,19 @@ public class DeploymentHelper {
 					serviceReturned, memory);
 		}
 
-		return currentStates;
+		// detect removed instances
+		for (Iterator<Entry<String, State>> iterator = memory.getOldStatesLc().entrySet().iterator(); iterator
+				.hasNext();) {
+			Entry<String, State> entry = iterator.next();
 
+			if (!currentStates.containsKey(entry.getKey())) {
+				manager.sendLifeCycleEvent(serviceId, entry.getKey(), Action.UNDEPLOYMENT_STARTED);
+				manager.sendLifeCycleEvent(serviceId, entry.getKey(), Action.UNDEPLOYED);
+				iterator.remove();
+			}
+		}
+
+		memory.refresh(currentStates);
 	}
 
 	protected void evaluateChangeOfOneUnitInstance(
@@ -229,14 +215,14 @@ public class DeploymentHelper {
 
 	public class Memory {
 
-		Map<String, String> oldStates;
+		Map<String, String> oldStates = new HashMap<>();
 		Map<String, State> oldStatesLc = new HashMap<>();
 
 		public void refresh(Map<String, String> currentStates) {
 
 			oldStates = currentStates;
-
 			State temp;
+
 			for (String uInstId : currentStates.keySet()) {
 				temp = DeploymentMapper.convert(oldStates.get(uInstId));
 				if (temp != null) {
@@ -257,6 +243,10 @@ public class DeploymentHelper {
 
 		public State oldLc(String uInstId) {
 			return oldStatesLc.get(uInstId);
+		}
+
+		public Map<String, State> getOldStatesLc() {
+			return oldStatesLc;
 		}
 
 	}

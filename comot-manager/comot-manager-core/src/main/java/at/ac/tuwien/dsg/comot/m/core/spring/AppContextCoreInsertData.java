@@ -135,11 +135,14 @@ public class AppContextCoreInsertData {
 				new ResourceOrQualityType(Constants.VIEW)));
 
 		monitoring.hasPrimitiveOperation(
-				new ComotCustomEvent("Set Metric Composition Rules", ComotEvent.SET_MCR.toString(), true));
+				new ComotCustomEvent("Set Metric Composition Rules", ComotEvent.SET_MCR.toString(), true,
+						ComotCustomEvent.Type.CONFIGURATION));
 		monitoring.hasPrimitiveOperation(
-				new ComotCustomEvent("Start monitoring", ComotEvent.MELA_START.toString(), false));
+				new ComotCustomEvent("Start monitoring", ComotEvent.MELA_START.toString(), false,
+						ComotCustomEvent.Type.ACTION));
 		monitoring.hasPrimitiveOperation(
-				new ComotCustomEvent("Stop monitoring", ComotEvent.MELA_STOP.toString(), false));
+				new ComotCustomEvent("Stop monitoring", ComotEvent.MELA_STOP.toString(), false,
+						ComotCustomEvent.Type.ACTION));
 
 		// RSYBL
 
@@ -159,11 +162,17 @@ public class AppContextCoreInsertData {
 				new ComotLifecycleEvent("Stop controller", Action.STOP_CONTROLLER.toString()));
 
 		control.hasPrimitiveOperation(
-				new ComotCustomEvent("Set Control Metrics", ComotEvent.SET_MCR.toString(), true));
+				new ComotCustomEvent("Set Control Metrics", ComotEvent.SET_MCR.toString(), true,
+						ComotCustomEvent.Type.CONFIGURATION));
 		control.hasPrimitiveOperation(
-				new ComotCustomEvent("Start controller", ComotEvent.RSYBL_START.toString(), false));
+				new ComotCustomEvent("Set Elasticity Capabilities Effects", ComotEvent.RSYBL_SET_EFFECTS.toString(),
+						true, ComotCustomEvent.Type.CONFIGURATION));
 		control.hasPrimitiveOperation(
-				new ComotCustomEvent("Stop controller", ComotEvent.RSYBL_STOP.toString(), false));
+				new ComotCustomEvent("Start controller", ComotEvent.RSYBL_START.toString(), false,
+						ComotCustomEvent.Type.ACTION));
+		control.hasPrimitiveOperation(
+				new ComotCustomEvent("Stop controller", ComotEvent.RSYBL_STOP.toString(), false,
+						ComotCustomEvent.Type.ACTION));
 		try {
 			coordinator.addStaticEps(deployment);
 			coordinator.addStaticEps(monitoring);
@@ -184,11 +193,14 @@ public class AppContextCoreInsertData {
 					new String[] { Constants.ROLE_OBSERVER });
 
 			monitoringDynamic.hasPrimitiveOperation(
-					new ComotCustomEvent("Set Metric Composition Rules", ComotEvent.SET_MCR.toString(), true));
+					new ComotCustomEvent("Set Metric Composition Rules", ComotEvent.SET_MCR.toString(), true,
+							ComotCustomEvent.Type.CONFIGURATION));
 			monitoringDynamic.hasPrimitiveOperation(
-					new ComotCustomEvent("Start monitoring", ComotEvent.MELA_START.toString(), false));
+					new ComotCustomEvent("Start monitoring", ComotEvent.MELA_START.toString(), false,
+							ComotCustomEvent.Type.ACTION));
 			monitoringDynamic.hasPrimitiveOperation(
-					new ComotCustomEvent("Stop monitoring", ComotEvent.MELA_STOP.toString(), false));
+					new ComotCustomEvent("Stop monitoring", ComotEvent.MELA_STOP.toString(), false,
+							ComotCustomEvent.Type.ACTION));
 
 			monitoringDynamic.setServiceTemplate(new Template(melaService.getId(), melaService));
 
@@ -211,11 +223,17 @@ public class AppContextCoreInsertData {
 					new ComotLifecycleEvent("Stop controller", Action.STOP_CONTROLLER.toString()));
 
 			rsyblDynamic.hasPrimitiveOperation(
-					new ComotCustomEvent("Set Metric Composition Rules", ComotEvent.SET_MCR.toString(), true));
+					new ComotCustomEvent("Set Metric Composition Rules", ComotEvent.SET_MCR.toString(), true,
+							ComotCustomEvent.Type.CONFIGURATION));
+			control.hasPrimitiveOperation(
+					new ComotCustomEvent("Set Elasticity Capabilities Effects",
+							ComotEvent.RSYBL_SET_EFFECTS.toString(), true, ComotCustomEvent.Type.CONFIGURATION));
 			rsyblDynamic.hasPrimitiveOperation(
-					new ComotCustomEvent("Start control", ComotEvent.RSYBL_START.toString(), false));
+					new ComotCustomEvent("Start control", ComotEvent.RSYBL_START.toString(), false,
+							ComotCustomEvent.Type.ACTION));
 			rsyblDynamic.hasPrimitiveOperation(
-					new ComotCustomEvent("Stop control", ComotEvent.RSYBL_STOP.toString(), false));
+					new ComotCustomEvent("Stop control", ComotEvent.RSYBL_STOP.toString(), false,
+							ComotCustomEvent.Type.ACTION));
 
 			rsyblDynamic.setServiceTemplate(new Template(rsyblService.getId(), rsyblService));
 

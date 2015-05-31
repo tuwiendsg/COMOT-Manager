@@ -250,7 +250,7 @@ define(function(require) {
 
 		return source;
 	}
-
+	
 	function processTransitionsToMap(transitions) {
 
 		var tMap = [];
@@ -378,7 +378,7 @@ function showEvent(events, event) {
 		lifecycle = true;
 	}
 
-	if (events().length == 6) {
+	if (events().length == 7) {
 		events.shift();
 	}
 
@@ -419,11 +419,6 @@ function createLifecycle(graph, divId, lastState, currentState) {
 	}).style("stroke-width", function(d) {
 		return Math.sqrt(d.value);
 	}).attr("marker-end", function(d) {
-		// if (d.name === lastAction) {
-		// return "url(#normal)";
-		// } else {
-		// return "url(#normal)";
-		// }
 		return "url(#normal)";
 	});
 

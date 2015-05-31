@@ -194,14 +194,22 @@ public class Coordinator {
 			String rPath = env.getProperty(ConfigConstants.REPO_PATH);
 			String rFile = UUID.randomUUID() + FILE_SUFFIX;
 
+			LOG.info("aaa");
+
 			UtilsFile.upload(file, host, rPath + rFile, user, new File(pem));
+
+			LOG.info("bbb");
 
 			CloudService service = infoService.getOsuInstance(epsInstanceId).getService();
 			insertConfigToTosca(service, rFile);
 			infoService.updateService(service);
 		}
 
-		sendAndWaitForId(new CustomEvent(null, null, EpsEvent.EPS_DYNAMIC_REQUESTED.toString(), null, epsInstanceId));
+		LOG.info("ccc");
+
+		sendCustom(new CustomEvent(null, null, EpsEvent.EPS_DYNAMIC_REQUESTED.toString(), null, epsInstanceId));
+
+		LOG.info("ddd");
 
 		return epsInstanceId;
 	}

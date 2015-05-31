@@ -57,11 +57,11 @@ public class ComotExceptionMapper implements ExceptionMapper<Exception> {
 
 		} else if (e.getClass().equals(ComotIllegalArgumentException.class)) {
 			LOG.info("Wrong user input: {}", e.getMessage());
-			return Response.status(400).entity(resolve(e.getMessage(), null)).build();
+			return Response.status(422).entity(resolve(e.getMessage(), null)).build();
 
 		} else if (e.getClass().equals(ComotLifecycleException.class)) {
 			LOG.info("Lifecycle exception: {}", e.getMessage());
-			return Response.status(400).entity(resolve(e.getMessage(), null)).build();
+			return Response.status(422).entity(resolve(e.getMessage(), null)).build();
 
 		} else if (e.getClass().equals(EpsException.class)) {
 			EpsException ce = (EpsException) e;

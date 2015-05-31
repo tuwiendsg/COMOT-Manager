@@ -85,8 +85,6 @@ public class ElasticityAnalyzis {
 			change = iterator.next();
 			eventType = Recording.extractEventName(change);
 
-			LOG.info(eventType + " " + ComotEvent.rsyblActionPlan(IEvent.Stage.START));
-
 			// ACTION PLAN
 			if (eventType.equals(ComotEvent.rsyblActionPlan(IEvent.Stage.START))) {
 

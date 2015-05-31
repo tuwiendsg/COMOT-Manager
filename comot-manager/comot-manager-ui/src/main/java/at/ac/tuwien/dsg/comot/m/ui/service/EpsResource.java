@@ -125,6 +125,8 @@ public class EpsResource {
 		newFile.getParentFile().mkdirs();
 		FileUtils.copyInputStreamToFile(fileInputStream, newFile);
 
+		LOG.info("wwww");
+
 		String serviceId = coordinator.createDynamicEps(epsId, newFile);
 
 		return Response.ok(serviceId).build();

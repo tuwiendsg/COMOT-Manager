@@ -21,7 +21,7 @@ define(function(require) {
 	var configFile = {
 		value : null
 	};
-
+	
 	var model = {
 		// properties
 		services : ko.observableArray(),
@@ -34,6 +34,7 @@ define(function(require) {
 		},
 		attached : function() {
 			getFile("configFile", configFile);
+			$(".modal-backdrop").remove();
 		}
 	}
 

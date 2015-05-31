@@ -58,19 +58,28 @@
 		// ERROR
 		if (isFunction(onError)) {
 			core.error = onError;
-			
+
 		} else if (onError === null || typeof onError === 'undefined') {
 			core.error = function(request, status, error) {
 
-				notify.error("Failed. \n Reason: " + request.status + request.statusText);
+				if (request.status == 422) {
+					notify.warning(request.responseText);
+				} else {
+					notify.error("Failed. \n Reason: " + request.status + " - " + request.statusText + ", "
+							+ request.responseText);
+				}
 			}
 		} else if (typeof onError === 'string') {
 			core.error = function(request, status, error) {
-				
+
 				if (request.responseText === "") {
 					notify.error(onError);
 				} else {
-					notify.error(onError + "\n Reason: " + request.responseText);
+					if (request.status == 422) {
+						notify.warning(onError + "\n Reason: " + request.responseText);
+					} else {
+						notify.error(onError + "\n Reason: " + request.responseText);
+					}
 				}
 			}
 		}

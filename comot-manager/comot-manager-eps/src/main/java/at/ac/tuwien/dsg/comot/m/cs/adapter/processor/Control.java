@@ -72,6 +72,7 @@ public class Control extends Processor implements ControlEventsListener {
 	protected Set<String> controlledSet = Collections.synchronizedSet(new HashSet<String>());
 	protected Map<String, CompositionRulesConfiguration> mcrMap = Collections
 			.synchronizedMap(new HashMap<String, CompositionRulesConfiguration>());
+	protected Map<String, String> effectsMap = Collections.synchronizedMap(new HashMap<String, String>());
 
 	public void setHostAndPort(String host, int port) {
 		control.setHostAndPort(host, port);
@@ -170,7 +171,11 @@ public class Control extends Processor implements ControlEventsListener {
 
 		} else if (event.equals(ComotEvent.RSYBL_SET_EFFECTS.toString())) {
 
-			control.updateEffects(serviceId, optionalMessage);
+			effectsMap.put(serviceId, optionalMessage);
+
+			if (isManaged(serviceId)) {
+				control.updateEffects(serviceId, optionalMessage);
+			}
 		}
 
 	}
@@ -201,6 +206,10 @@ public class Control extends Processor implements ControlEventsListener {
 
 			if (mcrMap.containsKey(serviceId)) {
 				control.createMcr(serviceId, mcrMap.get(serviceId));
+			}
+
+			if (effectsMap.containsKey(serviceId)) {
+				control.updateEffects(serviceId, effectsMap.get(serviceId));
 			}
 
 			control.startControl(serviceId);
