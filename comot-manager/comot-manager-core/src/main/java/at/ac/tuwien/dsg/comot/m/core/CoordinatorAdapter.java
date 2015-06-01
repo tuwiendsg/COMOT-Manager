@@ -21,8 +21,6 @@ package at.ac.tuwien.dsg.comot.m.core;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBException;
-
 import org.springframework.context.ApplicationContext;
 
 import at.ac.tuwien.dsg.comot.m.adapter.general.Bindings;
@@ -37,6 +35,7 @@ import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessage;
 import at.ac.tuwien.dsg.comot.m.common.event.state.ExceptionMessageLifeCycle;
 import at.ac.tuwien.dsg.comot.m.common.event.state.Transition;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotException;
+import at.ac.tuwien.dsg.comot.m.common.exception.ComotIllegalArgumentException;
 import at.ac.tuwien.dsg.comot.m.common.exception.ComotLifecycleException;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 
@@ -45,7 +44,7 @@ public abstract class CoordinatorAdapter extends Processor {
 	protected String serviceId;
 	protected Coordinator coordinator;
 	protected Signal signal;
-	protected String exceptionMsg;
+	protected Exception exception;
 	protected AbstractEvent event;
 
 	@Override
@@ -85,17 +84,25 @@ public abstract class CoordinatorAdapter extends Processor {
 	@Override
 	public void onExceptionEvent(ExceptionMessage msg) throws Exception {
 
-		if (msg instanceof ExceptionMessageLifeCycle) {
-			exceptionMsg = ((ExceptionMessageLifeCycle) msg).getMessage();
+		if (event.getEventId().equals(msg.getEventCauseId())) {
 
-			process(((ExceptionMessageLifeCycle) msg).getEvent(), true);
+			if (ComotIllegalArgumentException.class.getName().equals(msg.getType())) {
+				exception = new ComotIllegalArgumentException(msg.getMessage());
+
+			} else if (msg instanceof ExceptionMessageLifeCycle) {
+				exception = new ComotLifecycleException(((ExceptionMessageLifeCycle) msg).getMessage());
+
+			} else {
+				exception = new Exception(msg.getMessage());
+			}
+
+			signal.result = false;
 		}
-
 	}
 
 	public abstract void process(AbstractEvent event, boolean exception);
 
-	public void send() throws InterruptedException, JAXBException, ComotException {
+	public void send() throws Exception {
 
 		if (event instanceof LifeCycleEvent) {
 			coordinator.sendLifeCycle((LifeCycleEvent) event);
@@ -117,7 +124,7 @@ public abstract class CoordinatorAdapter extends Processor {
 		} else if (signal.result) {
 			return;
 		} else {
-			throw new ComotLifecycleException(exceptionMsg);
+			throw exception;
 		}
 
 	}

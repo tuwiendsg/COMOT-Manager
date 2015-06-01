@@ -53,6 +53,7 @@ public class ProcessorListener implements MessageListener {
 		// LOG.info(manager.logId() + " >>> " + message.getMessageProperties().getReceivedRoutingKey());
 
 		String serviceId = null;
+		String eventCauseId = null;
 		ComotMessage comotMsg;
 		try {
 
@@ -73,6 +74,7 @@ public class ProcessorListener implements MessageListener {
 				String groupId = msg.getEvent().getGroupId();
 				String origin = msg.getEvent().getOrigin();
 				Map<String, Transition> transitions = msg.getTransitions();
+				eventCauseId = msg.getEvent().getEventId();
 
 				if (msg.getEvent() instanceof LifeCycleEvent) {
 					LifeCycleEvent event = (LifeCycleEvent) msg.getEvent();
@@ -113,7 +115,7 @@ public class ProcessorListener implements MessageListener {
 
 		} catch (Exception e) {
 			try {
-				manager.sendExceptionEvent(serviceId, e);
+				manager.sendExceptionEvent(serviceId, eventCauseId, e);
 			} catch (Exception e1) {
 				LOG.error("{}", e1);
 			}

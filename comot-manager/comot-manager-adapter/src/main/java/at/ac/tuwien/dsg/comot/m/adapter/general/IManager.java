@@ -42,7 +42,7 @@ public interface IManager {
 	void sendCustomEvent(String serviceId, String groupId, String eventName, String epsId, String message,
 			String correlationId) throws JAXBException;
 
-	void sendExceptionEvent(String instanceId, Exception e) throws JAXBException;
+	void sendExceptionEvent(String instanceId, String eventCauseId, Exception e) throws JAXBException;
 
 	void stop();
 

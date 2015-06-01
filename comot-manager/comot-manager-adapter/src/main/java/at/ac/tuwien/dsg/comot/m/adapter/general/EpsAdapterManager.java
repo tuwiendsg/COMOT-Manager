@@ -162,6 +162,8 @@ public class EpsAdapterManager extends Manager {
 			if (admin != null) {
 				admin.deleteQueue(queueNameInstance(serviceId));
 			}
+
+			containers.remove(serviceId);
 		}
 	}
 

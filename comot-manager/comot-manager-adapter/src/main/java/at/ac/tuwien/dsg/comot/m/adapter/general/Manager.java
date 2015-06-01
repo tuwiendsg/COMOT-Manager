@@ -163,9 +163,9 @@ public abstract class Manager implements IManager {
 	}
 
 	@Override
-	public void sendExceptionEvent(String serviceId, Exception e) throws JAXBException {
+	public void sendExceptionEvent(String serviceId, String eventCauseId, Exception e) throws JAXBException {
 
-		ExceptionMessage msg = new ExceptionMessage(serviceId, getId(), System.currentTimeMillis(), e);
+		ExceptionMessage msg = new ExceptionMessage(serviceId, getId(), System.currentTimeMillis(), eventCauseId, e);
 
 		String bindingKey = serviceId + "." + getId();
 

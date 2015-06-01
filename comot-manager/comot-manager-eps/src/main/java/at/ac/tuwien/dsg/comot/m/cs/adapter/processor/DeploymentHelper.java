@@ -91,7 +91,7 @@ public class DeploymentHelper {
 					oneInteration(memory, serviceId, service);
 
 				} catch (ComotException e) {
-					dAdapt.getManager().sendExceptionEvent(serviceId, e);
+					dAdapt.getManager().sendExceptionEvent(serviceId, null, e);
 					LOG.warn("{}", e);
 				}
 
@@ -103,7 +103,7 @@ public class DeploymentHelper {
 			LOG.info("Task interrupted as expected");
 		} catch (Exception e) {
 			try {
-				dAdapt.getManager().sendExceptionEvent(serviceId, e);
+				dAdapt.getManager().sendExceptionEvent(serviceId, null, e);
 			} catch (JAXBException e1) {
 				LOG.error("{}", e1);
 			}

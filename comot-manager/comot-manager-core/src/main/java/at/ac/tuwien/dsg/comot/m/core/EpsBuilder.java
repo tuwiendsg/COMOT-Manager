@@ -130,7 +130,7 @@ public class EpsBuilder extends Processor {
 				throw new ComotIllegalArgumentException("The EPS instance '" + optionalMessage
 						+ "' can not be removed, if it is assigned to a cloud service.");
 			} else {
-				manager.sendLifeCycleEvent(serviceId, serviceId, Action.STOP);
+				manager.sendLifeCycleEvent(serviceId, serviceId, Action.TERMINATE);
 			}
 
 		}

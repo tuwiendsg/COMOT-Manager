@@ -118,7 +118,7 @@ public class ServiceManager {
 		try {
 			executeLifeCycleEvent(event);
 		} catch (ComotException e) {
-			sendException(e);
+			sendException(event.getEventId(), e);
 		}
 
 		container.start();
@@ -130,8 +130,12 @@ public class ServiceManager {
 		@Override
 		public void onMessage(Message message) {
 
+			String eventCauseId = null;
+
 			try {
+
 				AbstractEvent event = UtilsLc.abstractEvent(message);
+				eventCauseId = event.getEventId();
 
 				LOG.info(logId() + " processing: {}", event);
 
@@ -147,10 +151,10 @@ public class ServiceManager {
 
 			} catch (Exception e) {
 				try {
-					sendException(e);
-					LOG.error("{}", e);
+					sendException(eventCauseId, e);
+					LOG.error("", e);
 				} catch (JAXBException e1) {
-					LOG.error("{}", e1);
+					LOG.error("", e1);
 				}
 			}
 		}
@@ -366,7 +370,7 @@ public class ServiceManager {
 
 	}
 
-	protected void sendException(Exception e) throws JAXBException {
+	protected void sendException(String eventCauseId, Exception e) throws JAXBException {
 
 		ExceptionMessage msg;
 
@@ -376,7 +380,7 @@ public class ServiceManager {
 			msg = new ExceptionMessageLifeCycle(serviceId, serviceId, System.currentTimeMillis(),
 					ComotLifecycleException.class.getSimpleName(), lcs.getMessage(), null, lcs.getEvent());
 		} else {
-			msg = new ExceptionMessage(serviceId, serviceId, System.currentTimeMillis(), e);
+			msg = new ExceptionMessage(serviceId, serviceId, System.currentTimeMillis(), eventCauseId, e);
 		}
 
 		send(Constants.EXCHANGE_EXCEPTIONS, serviceId + "." + serviceId, msg);

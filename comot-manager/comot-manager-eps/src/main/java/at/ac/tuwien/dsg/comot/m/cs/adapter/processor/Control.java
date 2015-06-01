@@ -90,7 +90,7 @@ public class Control extends Processor implements ControlEventsListener {
 				.addLifecycle(serviceId + "." + Action.STOP_CONTROLLER + ".#")
 				.addLifecycle(serviceId + "." + Action.TERMINATE + ".#")
 
-				.addCustom(serviceId + ".*." + "." + Type.SERVICE + "." + getId());
+				.addCustom(serviceId + ".*." + Type.SERVICE + "." + getId());
 	}
 
 	@Override
@@ -252,6 +252,7 @@ public class Control extends Processor implements ControlEventsListener {
 	public void onMessage(IEvent event) {
 
 		String serviceId = null;
+
 		try {
 			String optionalMsg = null;
 			serviceId = event.getServiceId();
@@ -299,7 +300,7 @@ public class Control extends Processor implements ControlEventsListener {
 
 		} catch (Exception e) {
 			try {
-				manager.sendExceptionEvent(serviceId, e);
+				manager.sendExceptionEvent(serviceId, null, e);
 			} catch (Exception e1) {
 				LOG.error("{}", e1);
 			}

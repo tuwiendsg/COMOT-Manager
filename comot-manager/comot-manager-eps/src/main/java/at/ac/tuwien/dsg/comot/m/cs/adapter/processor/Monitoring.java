@@ -64,7 +64,7 @@ public class Monitoring extends Processor {
 				.addLifecycle(instanceId + ".*.*.TRUE.*." + State.PASSIVE + ".#")
 				.addLifecycle(instanceId + "." + Action.TERMINATE + ".#")
 
-				.addCustom(instanceId + ".*." + "." + Type.SERVICE + "." + getId());
+				.addCustom(instanceId + ".*." + Type.SERVICE + "." + getId());
 	}
 
 	@Override
