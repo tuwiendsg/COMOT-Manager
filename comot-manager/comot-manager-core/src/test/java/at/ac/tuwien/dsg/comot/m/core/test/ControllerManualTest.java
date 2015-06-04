@@ -51,9 +51,9 @@ import at.ac.tuwien.dsg.comot.model.runtime.UnitInstance;
 import at.ac.tuwien.dsg.comot.model.type.DirectiveType;
 import at.ac.tuwien.dsg.comot.model.type.State;
 
-public class ControllerTest extends AbstractTest {
+public class ControllerManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ControllerTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ControllerManualTest.class);
 
 	protected String serviceId;
 

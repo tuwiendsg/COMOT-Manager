@@ -43,9 +43,9 @@ import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.rsybl.CloudServiceXML;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.DeploymentDescription;
 
-public class RsyblClientTest extends AbstractTest {
+public class RsyblClientManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RsyblClientTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RsyblClientManualTest.class);
 
 	@Autowired
 	private SalsaClient salsa;

@@ -46,9 +46,9 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshots;
 
-public class MelaClientTest extends AbstractTest {
+public class MelaClientManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MelaClientTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MelaClientManualTest.class);
 
 	public static final String SERVICE_ID = "example_executableOnVM";// "example_executableOnVM"; //comot_tomcat_id
 	public static final String TOPOLOGY_ID = "example_topology";

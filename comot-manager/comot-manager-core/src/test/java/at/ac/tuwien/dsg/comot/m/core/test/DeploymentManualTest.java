@@ -42,9 +42,9 @@ import at.ac.tuwien.dsg.comot.m.cs.UtilsCs;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.type.State;
 
-public class DeploymentTest extends AbstractTest {
+public class DeploymentManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DeploymentTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DeploymentManualTest.class);
 
 	protected String serviceId;
 

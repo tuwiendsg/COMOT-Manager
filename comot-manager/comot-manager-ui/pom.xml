@@ -152,6 +152,7 @@
 								<resource>
 									<directory>${basedir}/src/main/resources/properties</directory>
 									<include>application.properties</include>
+									<include>init.properties</include>
 								</resource>
 							</resources>
 						</configuration>
@@ -168,10 +169,6 @@
 								<resource>
 									<directory>${basedir}/../resources/init</directory>
 									<filtering>false</filtering>
-								</resource>
-								<resource>
-									<directory>${basedir}/src/main/resources/properties</directory>
-									<include>init.properties</include>
 								</resource>
 							</resources>
 						</configuration>

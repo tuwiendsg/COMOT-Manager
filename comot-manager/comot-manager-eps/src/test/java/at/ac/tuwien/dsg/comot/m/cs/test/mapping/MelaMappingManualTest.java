@@ -50,9 +50,9 @@ import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElement;
 import at.ac.tuwien.dsg.mela.common.monitoringConcepts.MonitoredElementMonitoringSnapshot;
 import at.ac.tuwien.dsg.mela.common.requirements.Requirements;
 
-public class MelaMappingTest extends AbstractTest {
+public class MelaMappingManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MelaMappingTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MelaMappingManualTest.class);
 
 	@Autowired
 	protected MelaOrika orika;

@@ -37,9 +37,9 @@ import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.rsybl.CloudServiceXML;
 import at.ac.tuwien.dsg.comot.test.model.examples.STemplates;
 
-public class RsyblMappingTest extends AbstractTest {
+public class RsyblMappingManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RsyblMappingTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RsyblMappingManualTest.class);
 
 	@Autowired
 	protected RsyblOrika orika;

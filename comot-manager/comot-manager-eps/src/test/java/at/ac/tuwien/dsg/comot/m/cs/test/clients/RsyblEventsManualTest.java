@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
 import at.ac.tuwien.dsg.comot.m.common.test.UtilsT;
 import at.ac.tuwien.dsg.csdg.outputProcessing.eventsNotification.ActionPlanEvent;
 
-public class RsyblEventsTest {
+public class RsyblEventsManualTest {
 
-	private final Logger LOG = LoggerFactory.getLogger(RsyblEventsTest.class);
+	private final Logger LOG = LoggerFactory.getLogger(RsyblEventsManualTest.class);
 
 	private String QUEUE_NAME = "events";
 	private ConnectionFactory factory;
@@ -48,8 +48,6 @@ public class RsyblEventsTest {
 
 	@Test
 	public void testProducer() throws JMSException {
-
-		// LOG.info(ActiveMQConnection.DEFAULT_BROKER_URL);
 
 		factory = new ActiveMQConnectionFactory("tcp://128.130.172.191:61616");
 		// factory = new ActiveMQConnectionFactory("tcp://localhost:61616");

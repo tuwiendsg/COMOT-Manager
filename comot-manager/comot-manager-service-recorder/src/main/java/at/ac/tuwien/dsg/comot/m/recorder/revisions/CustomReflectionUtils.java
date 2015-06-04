@@ -78,7 +78,8 @@ public class CustomReflectionUtils {
 
 		return clazz.equals(Byte.class) || clazz.equals(Short.class) || clazz.equals(Integer.class)
 				|| clazz.equals(Long.class) || clazz.equals(Float.class) || clazz.equals(Double.class)
-				|| clazz.equals(Character.class) || clazz.equals(String.class) || clazz.isPrimitive();
+				|| clazz.equals(Boolean.class) || clazz.equals(Character.class) || clazz.equals(String.class)
+				|| clazz.isPrimitive();
 	}
 
 	public static Class<?> classOfCollection(Field field) {

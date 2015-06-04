@@ -43,9 +43,9 @@ import at.ac.tuwien.dsg.comot.m.cs.connector.SalsaClient;
 import at.ac.tuwien.dsg.comot.m.cs.test.AbstractTest;
 import at.ac.tuwien.dsg.csdg.inputProcessing.multiLevelModel.deploymentDescription.DeploymentDescription;
 
-public class SalsaClientTest extends AbstractTest {
+public class SalsaClientManualTest extends AbstractTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SalsaClientTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SalsaClientManualTest.class);
 
 	public static final String SERVICE_ID = "example_deployOneVM";
 	public static final String TOPOLOGY_ID = "example_topology";

@@ -53,46 +53,33 @@ import at.ac.tuwien.dsg.comot.test.model.examples.STemplates;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { AppContextTest.class, AppContextCore.class })
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class AnalyticsTest {
+public class AnalyticsManualTest {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsTest.class);
+	private static final Logger LOG = LoggerFactory.getLogger(AnalyticsManualTest.class);
 
-	@Autowired
-	private TimeAnalyzis engine;
 	@Autowired
 	protected RevisionApi revisionApi;
 	@Autowired
 	protected ChangeRepo changeRepo;
 
 	@Autowired
-	protected ElasticityAnalyzis elAnalysis;
+	private TimeAnalyzis deplTimesAnalysis;
+	@Autowired
+	protected ElasticityAnalyzis elastAnalysis;
 
-	// @Before
-	// public void setUp() {
-	// // http://neo4j.com/docs/1.8.3/server-embedded.html
-	// // http://127.0.0.1:7474/
-	// srv = new WrappingNeoServerBootstrapper((GraphDatabaseAPI) db);
-	// srv.start();
-	// }
-	//
-	// @After
-	// public void cleanUp() {
-	// srv.stop();
-	// }
 	@Test
-	public void bbbb() throws JAXBException, InstantiationException, IllegalAccessException, IllegalArgumentException,
+	public void deplTimesTest() throws JAXBException, InstantiationException, IllegalAccessException,
+			IllegalArgumentException,
 			ClassNotFoundException, RecorderException {
 
-		// elAnalysis.bbbb();
-
-		for (ElasticPlanReport report : elAnalysis.doOneService("HelloElasticity_1")) {
+		for (ElasticPlanReport report : elastAnalysis.doOneService("HelloElasticity_1")) {
 			LOG.info("{}", Utils.asJsonString(report));
 		}
 
 	}
 
 	@Test
-	public void aaaaa() throws IllegalArgumentException, IllegalAccessException, InstantiationException,
+	public void alastAnalysisTest() throws IllegalArgumentException, IllegalAccessException, InstantiationException,
 			ClassNotFoundException, RecorderException {
 
 		CloudService service = STemplates.fullService();
@@ -130,7 +117,7 @@ public class AnalyticsTest {
 		// change 3
 
 		nav.getInstance(osInstId).setEnvId("bbb");
-		;
+
 		changeProperties = createProps("SOME_EVENT", System.currentTimeMillis());
 
 		revisionApi.createOrUpdateRegion(
@@ -138,7 +125,7 @@ public class AnalyticsTest {
 
 		// UtilsTest.sleepInfinit();
 
-		engine.deploymentEvents(STemplates.serviceId);
+		deplTimesAnalysis.deploymentEvents(STemplates.serviceId);
 
 	}
 

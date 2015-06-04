@@ -38,7 +38,7 @@ import at.ac.tuwien.dsg.comot.m.cs.adapter.ComotEvent;
 import at.ac.tuwien.dsg.comot.model.devel.structure.CloudService;
 import at.ac.tuwien.dsg.comot.model.type.State;
 
-public class MonitoringTest extends AbstractTest {
+public class MonitoringManualTest extends AbstractTest {
 
 	protected TeAgentAdapter agent;
 	protected String serviceId;
