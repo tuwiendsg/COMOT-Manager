@@ -60,6 +60,7 @@
 			<groupId>at.ac.tuwien.dsg.comot</groupId>
 			<artifactId>comot-manager-info-service-mock</artifactId>
 			<scope>test</scope>
+			<type>war</type>
 		</dependency>
 		<dependency>
 			<groupId>at.ac.tuwien.dsg.comot</groupId>

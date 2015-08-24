@@ -138,6 +138,7 @@
 				<groupId>at.ac.tuwien.dsg.comot</groupId>
 				<artifactId>comot-manager-info-service-mock</artifactId>
 				<version>0.2</version>
+				<type>war</type>
 			</dependency>
 			<dependency>
 				<groupId>at.ac.tuwien.dsg.comot</groupId>

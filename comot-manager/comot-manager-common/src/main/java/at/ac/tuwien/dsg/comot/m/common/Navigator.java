@@ -328,13 +328,13 @@ public class Navigator {
 
 	public static List<ServiceTopology> getAllTopologies(CloudService cloudService) {
 		List<ServiceTopology> all = getAllTopologies(cloudService.getServiceTopologies());
-		all.addAll(cloudService.getServiceTopologies());
 		return all;
 	}
 
 	public static List<ServiceTopology> getAllTopologies(Collection<ServiceTopology> topologies) {
 		List<ServiceTopology> all = new ArrayList<>();
 		for (ServiceTopology topology : topologies) {
+			all.add(topology);
 			all.addAll(getAllTopologies(topology.getServiceTopologies()));
 		}
 		return all;
